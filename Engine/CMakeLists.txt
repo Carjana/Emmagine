@@ -13,5 +13,6 @@ target_compile_definitions(Engine PRIVATE EMMA_BUILD_DLL)
 target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/libs)
 
 target_link_libraries(Engine PUBLIC SDL3)
+target_link_libraries(Engine PUBLIC spdlogd)
 
 add_dependencies(Engine CopySDL)

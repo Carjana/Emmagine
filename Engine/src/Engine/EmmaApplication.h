@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
 
-namespace Emmagine
+namespace Emma
 {
 	class EMMA_API EmmaApplication
 	{

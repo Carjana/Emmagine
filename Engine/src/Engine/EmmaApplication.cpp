@@ -1,5 +1,5 @@
 #include "EmmaApplication.h"
-namespace Emmagine
+namespace Emma
 {
 	EmmaApplication::EmmaApplication()= default;
 

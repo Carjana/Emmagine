@@ -13,6 +13,9 @@ elseif (CMAKE_BUILD_TYPE MATCHES Release)
     add_compile_definitions(RELEASE)
 endif ()
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 string(TOUPPER "PLATFORM_${CMAKE_SYSTEM_NAME}" SYS_NAME)
 add_compile_definitions(${SYS_NAME})
 
@@ -20,7 +23,6 @@ add_compile_definitions(${SYS_NAME})
 add_subdirectory(dependencies)
 
 add_subdirectory(Engine)
-add_subdirectory(Sandbox)
 
 add_subdirectory(Editor)
 

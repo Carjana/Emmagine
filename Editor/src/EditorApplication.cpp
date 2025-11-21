@@ -1,6 +1,6 @@
 #include "Emmagine.h"
 
-class EmmaEditor : public Emmagine::EmmaApplication
+class EmmaEditor : public Emma::EmmaApplication
 {
 public:
 
@@ -10,7 +10,7 @@ public:
 	}
 };
 
-Emmagine::EmmaApplication* Emmagine::CreateEmmaApplication()
+Emma::EmmaApplication* Emma::CreateEmmaApplication()
 {
 	return new EmmaEditor();
 }

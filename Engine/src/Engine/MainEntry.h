@@ -1,13 +1,16 @@
 #pragma once
 #include "EmmaApplication.h"
+#include "Logger.h"
 
-extern Emmagine::EmmaApplication* Emmagine::CreateEmmaApplication();
+extern Emma::EmmaApplication* Emma::CreateEmmaApplication();
 
 #ifdef PLATFORM_WINDOWS
 
 int main(int argc, char** argv)
 {
-	Emmagine::EmmaApplication *app = Emmagine::CreateEmmaApplication();
+	Emma::Logger::Init();
+	LOG_INFO("Loading Emma App...");
+	Emma::EmmaApplication *app = Emma::CreateEmmaApplication();
 	app->Run();
 	delete app;
 	return 0;
