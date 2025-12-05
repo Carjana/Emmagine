@@ -2,8 +2,6 @@
 
 #ifdef PLATFORM_WINDOWS
 
-extern Emma::EmmaApplication* Emma::CreateEmmaApplication();
-
 int main(int argc, char** argv)
 {
 	Emma::Logger::Init();

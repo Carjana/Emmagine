@@ -4,7 +4,7 @@
 
 #include "Core.h"
 #include "SDL3/SDL_log.h"
-#include "spdlog/logger.h"
+#include "spdlog/spdlog.h"
 
 inline const char* SDL_LOG_CATEGORIES[] =
 {

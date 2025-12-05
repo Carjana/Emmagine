@@ -15,3 +15,6 @@
 	#define EMMA_API DLL_IMPORT
 #endif
 
+#define BIT(x) (1 << x)
+
+#define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
