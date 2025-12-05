@@ -6,7 +6,10 @@ public:
 
 	void Run() override
 	{
-		while (true);
+		while (true)
+		{
+
+		}
 	}
 };
 

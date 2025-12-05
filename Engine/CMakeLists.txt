@@ -1,4 +1,4 @@
-file(GLOB_RECURSE Engine_SRC CONFIGURE_DEPENDS "*.cpp")
+file(GLOB_RECURSE Engine_SRC CONFIGURE_DEPENDS "*.cpp" "*.h")
 
 add_library(Engine SHARED ${Engine_SRC})
 
