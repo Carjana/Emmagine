@@ -23,7 +23,7 @@ namespace Emma
 		SDL_SetLogOutputFunction(SDL_Log, nullptr);
 	}
 
-	void Logger::SDL_Log(void * userdata, int category, SDL_LogPriority priority, const char * message)
+	void Logger::SDL_Log(void *userdata, int category, SDL_LogPriority priority, const char *message)
 	{
 		switch (priority)
 		{

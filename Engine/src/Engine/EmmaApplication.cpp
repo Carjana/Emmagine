@@ -1,38 +1,43 @@
 #include "EmmaApplication.h"
 
-#include "Logger.h"
-#include "Events/WindowEvents.h"
+#include "SDL3/SDL_init.h"
 
 namespace Emma
 {
-	EmmaApplication::EmmaApplication()= default;
-
-	EmmaApplication::~EmmaApplication()= default;
-
-	bool OnEvent(Event &e)
+	EmmaApplication::EmmaApplication()
 	{
-		std::stringstream stream;
-		stream << "Event Received: " << e.ToString();
-		LOG_CORE_TRACE(stream.str());
-		return true;
+		window = EmmaWindow::CreateEmmaWindow(WindowProps("Emmagine", 1280, 720));
+	}
+
+	EmmaApplication::~EmmaApplication()
+	{
+
 	}
 
 	void EmmaApplication::Run()
 	{
-		WindowMoveEvent event(1,1);
-		WindowCloseEvent closeEvent;
-		WindowResizeEvent resizeEvent(1,1);
-		LOG_INFO(event.ToString());
-		LOG_INFO(closeEvent.ToString())
-		LOG_INFO(resizeEvent.ToString())
-
-		EventDispatcher dispatcher(event);
-		EventDispatcher d1(closeEvent);
-		d1.DispatchEvent(EventDispatcher::EventFunction<WindowCloseEvent>(OnEvent));
-		dispatcher.DispatchEvent(EventDispatcher::EventFunction<WindowMoveEvent>(OnEvent));
-		while (true)
+		while (isRunning)
 		{
+			SDL_Event event;
+			while (SDL_PollEvent(&event))
+			{
+				switch (event.type)
+				{
+					case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+					case SDL_EVENT_QUIT:
+					{
+						isRunning = false;
+						return;
+					}break;
+					default:
+						break;
+				}
 
+				if (event.window.windowID == SDL_GetWindowID(window->window))
+				{
+					window->OnUpdate(event.window);
+				}
+			}
 		}
 	}
 }

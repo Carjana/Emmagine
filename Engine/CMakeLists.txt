@@ -8,6 +8,12 @@ target_include_directories(Engine PUBLIC
         ${CMAKE_SOURCE_DIR}/dependencies/includes
 )
 
+if (MSVC)
+target_compile_options(Engine PRIVATE /permissive- /W4)
+endif ()
+
+target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/emmapch.h)
+
 target_compile_definitions(Engine PRIVATE EMMA_BUILD_DLL)
 
 target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/libs)

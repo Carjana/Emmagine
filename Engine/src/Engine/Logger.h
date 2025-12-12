@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "Core.h"
 #include "SDL3/SDL_log.h"
 #include "spdlog/spdlog.h"
