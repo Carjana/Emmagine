@@ -14,6 +14,8 @@ namespace Emma
 
 	// Mouse Events
 		MouseMovedEvent,
+		MouseButtonEvent,
+		MouseWheelEvent,
 		EventTypeCount
 	};
 
@@ -31,7 +33,9 @@ namespace Emma
 		"WindowFocusEvent",
 		"WindowMouseFocusEvent",
 
-		"MouseMovedEvent"
+		"MouseMovedEvent",
+		"MouseButtonEvent",
+		"MouseWheelEvent"
 	};
 	static_assert(ArrayCount(EventTypeName) == (int)EventType::EventTypeCount);
 
@@ -43,6 +47,8 @@ namespace Emma
 		EventCategory::Application,		// Window Focus
 		EventCategory::Application,		// Window Mouse Focus
 		EventCategory::Mouse,			// Mouse Moved
+		EventCategory::Mouse,			// Mouse Button
+		EventCategory::Mouse,			// Mouse Wheel
 	};
 	static_assert(ArrayCount(EventCategoryFlags) == (int)EventType::EventTypeCount);
 
@@ -54,6 +60,8 @@ inline constexpr bool EventShouldLog[]
 	false,	// Window Focus
 	false,	// Window Mouse Focus
 	false,	// Mouse Moved
+	false,	// Mouse Button
+	false, 	// Mouse Wheel
 };
 	static_assert(ArrayCount(EventShouldLog) == (int)EventType::EventTypeCount);
 

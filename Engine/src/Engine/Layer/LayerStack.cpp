@@ -3,9 +3,7 @@
 namespace Emma
 {
 	LayerStack::LayerStack()
-	{
-		layerInsert = layers.begin();
-	}
+	{}
 
 	LayerStack::~LayerStack()
 	{
@@ -15,14 +13,7 @@ namespace Emma
 
 	void LayerStack::PushLayer(Layer *layer)
 	{
-		layerInsert = layers.emplace(layerInsert, layer);
-		layer->OnAttach();
-	}
-
-	void LayerStack::PushOverlay(Layer *overlay)
-	{
-		layers.emplace_back(overlay);
-		overlay->OnAttach();
+		layers.emplace_back(layer);
 	}
 
 	void LayerStack::PopLayer(Layer *layer)
@@ -30,18 +21,6 @@ namespace Emma
 		std::vector<Layer *>::iterator iterator = std::find(layers.begin(), layers.end(), layer);
 		if (iterator != layers.end())
 		{
-			layer->OnDetach();
-			layers.erase(iterator);
-			layerInsert--;
-		}
-	}
-
-	void LayerStack::PopOverlay(Layer *overlay)
-	{
-		std::vector<Layer *>::iterator iterator = std::find(layers.begin(), layers.end(), overlay);
-		if (iterator != layers.end())
-		{
-			overlay->OnDetach();
 			layers.erase(iterator);
 		}
 	}

@@ -22,7 +22,7 @@
 
 
 #if DEBUG
-	#define ASSERT(condition, ...) if(!condition) {LOG_INFO("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
+	#define ASSERT(condition, ...) if(!(condition)) {LOG_ERROR("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
 #else
 	#define ASSERT(condition, ...)
 #endif

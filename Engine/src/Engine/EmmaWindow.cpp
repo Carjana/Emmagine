@@ -29,6 +29,13 @@ namespace Emma
 		Height = props.Height;
 		SDL_GetWindowPosition(Window, ((int*)&X), (int*)&Y);
 		WindowId = SDL_GetWindowID(Window);
+
+		GPUDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL | SDL_GPU_SHADERFORMAT_METALLIB, true, nullptr);
+		ASSERT(GPUDevice, "GPU Device Creation Failed!", SDL_GetError());
+		bool result = SDL_ClaimWindowForGPUDevice(GPUDevice, Window);
+		ASSERT(result, "Failed to claim window for GPU Device!", SDL_GetError());
+
+		SDL_SetGPUSwapchainParameters(GPUDevice, Window, SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_VSYNC);
 	}
 
 	void EmmaWindow::HandleEvent(const SDL_Event &event)

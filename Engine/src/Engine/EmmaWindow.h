@@ -4,6 +4,7 @@
 #include "Core.h"
 #include "Events/Event.h"
 #include "SDL_events.h"
+#include "SDL_gpu.h"
 #include "SDL_video.h"
 
 namespace Emma
@@ -36,6 +37,7 @@ namespace Emma
 		inline void SetEventCallback(const EventCallbackFunc &callback);
 
 		SDL_Window *Window;
+		SDL_GPUDevice *GPUDevice;
 		unsigned int WindowId;
 		bool HasFocus;
 
