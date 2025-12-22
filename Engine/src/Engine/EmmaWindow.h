@@ -3,8 +3,8 @@
 #include "emmapch.h"
 #include "Core.h"
 #include "Events/Event.h"
-#include "SDL3/SDL_events.h"
-#include "SDL3/SDL_video.h"
+#include "SDL_events.h"
+#include "SDL_video.h"
 
 namespace Emma
 {
@@ -21,18 +21,23 @@ namespace Emma
 	{
 	public:
 		using EventCallbackFunc = std::function<void(Event&)>;
+
+		unsigned int Width;
+		unsigned int Height;
+
+		unsigned int X;
+		unsigned int Y;
+
 		EmmaWindow(const WindowProps& props);
 		~EmmaWindow();
 
-		void OnUpdate(SDL_WindowEvent event);
-
-		inline unsigned int GetWidth() const;
-		inline unsigned int GetHeight() const;
-		inline void GetWindowSize(int *width, int *height) const;
+		void HandleEvent(const SDL_Event &event);
 
 		inline void SetEventCallback(const EventCallbackFunc &callback);
 
-		SDL_Window *window;
+		SDL_Window *Window;
+		unsigned int WindowId;
+		bool HasFocus;
 
 		static EmmaWindow* CreateEmmaWindow(const WindowProps &props)
 		{
@@ -41,6 +46,7 @@ namespace Emma
 
 	private:
 		void Init(const WindowProps& props);
-		void Shutdown();
+		void Shutdown() const;
+		EventCallbackFunc eventCallback;
 	};
 }

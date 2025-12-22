@@ -3,28 +3,66 @@
 
 namespace Emma
 {
-	enum class EventType
+	enum class EventType : char
 	{
+	// Application Events
 		WindowMoveEvent,
 		WindowResizeEvent,
 		WindowCloseEvent,
+		WindowFocusEvent,
+		WindowMouseFocusEvent,
 
+	// Mouse Events
+		MouseMovedEvent,
 		EventTypeCount
+	};
+
+	enum class EventCategory
+	{
+		None = 0,
+		Application = BIT(1),
+		Mouse = BIT(2),
 	};
 
 	inline const char* EventTypeName[] = {
 		"WindowMoveEvent",
 		"WindowResizeEvent",
 		"WindowCloseEvent",
+		"WindowFocusEvent",
+		"WindowMouseFocusEvent",
+
+		"MouseMovedEvent"
 	};
 	static_assert(ArrayCount(EventTypeName) == (int)EventType::EventTypeCount);
 
-
-	enum class EventCategory
+	inline constexpr EventCategory EventCategoryFlags[]
 	{
-		None = 0,
-		Application = BIT(1),
+		EventCategory::Application,		// Window Move
+		EventCategory::Application,		// Window Resize
+		EventCategory::Application,		// Window Close
+		EventCategory::Application,		// Window Focus
+		EventCategory::Application,		// Window Mouse Focus
+		EventCategory::Mouse,			// Mouse Moved
 	};
+	static_assert(ArrayCount(EventCategoryFlags) == (int)EventType::EventTypeCount);
+
+inline constexpr bool EventShouldLog[]
+{
+	false,	// Window Move
+	false,	// Window Resize
+	false,	// Window Close
+	false,	// Window Focus
+	false,	// Window Mouse Focus
+	false,	// Mouse Moved
+};
+	static_assert(ArrayCount(EventShouldLog) == (int)EventType::EventTypeCount);
+
+#define ADD_VAR(Var) << ", " << #Var << ": " << Var
+#define SETUP_EVENT_TYPE(eventType) \
+	EventType GetEventType() override {return eventType;} \
+	int GetCategoryFlags() override {return (int)EventCategoryFlags[(int)eventType];} \
+	const char *GetName() override {return EventTypeName[(int)eventType];} \
+	static EventType GetStaticEventType() {return eventType;}
 
 	class EMMA_API Event
 	{
@@ -40,8 +78,7 @@ namespace Emma
 			return GetName();
 		};
 
-	protected:
-		bool isHandled = false;
+		bool IsHandled = false;
 	};
 
 	class EMMA_API EventDispatcher
@@ -58,7 +95,7 @@ namespace Emma
 		{
 			if (event.GetEventType() == T::GetStaticEventType())
 			{
-				event.isHandled = function(*(T*)&event);
+				event.IsHandled = function(*(T*)&event);
 				return true;
 			}
 			return false;

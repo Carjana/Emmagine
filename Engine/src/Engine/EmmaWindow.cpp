@@ -1,7 +1,11 @@
 #include "EmmaWindow.h"
 
-#include "SDL3/SDL_events.h"
-#include "SDL3/SDL_video.h"
+#include "Logger.h"
+#include "Events/MouseEvents.h"
+#include "Events/WindowEvents.h"
+#include "SDL_events.h"
+#include "SDL_gpu.h"
+#include "SDL_video.h"
 
 namespace Emma
 {
@@ -18,52 +22,94 @@ namespace Emma
 	void EmmaWindow::Init(const WindowProps &props)
 	{
 		LOG_INFO("Creating Window with Title \"{0}\", Width:{1}, Height:{2}", props.Title, props.Width, props.Height);
-		window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_VULKAN);
-		ASSERT(window, "Window Creation Failed!", SDL_GetError());
+		Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE);
+		ASSERT(Window, "Window Creation Failed!", SDL_GetError());
 		LOG_INFO("Window Created");
+		Width = props.Width;
+		Height = props.Height;
+		SDL_GetWindowPosition(Window, ((int*)&X), (int*)&Y);
+		WindowId = SDL_GetWindowID(Window);
 	}
 
-	void EmmaWindow::OnUpdate(SDL_WindowEvent event)
+	void EmmaWindow::HandleEvent(const SDL_Event &event)
 	{
+		if (event.window.windowID != WindowId)
+			return;
 		switch (event.type)
 		{
-			case SDL_EVENT_WINDOW_MOVED:
-				LOG_TRACE("Window Moved to x:{0}, y:{1}", event.data1, event.data2);
+			case SDL_EVENT_WINDOW_SHOWN:
+    		case SDL_EVENT_WINDOW_HIDDEN:
+    		case SDL_EVENT_WINDOW_EXPOSED:
+					break;
+    		case SDL_EVENT_WINDOW_MOVED:
+    		{
+    			X = event.window.data1;
+    			Y = event.window.data2;
+    			WindowMoveEvent emmaEvent(X, Y, WindowId);
+    			eventCallback(emmaEvent);
+    		}break;
+    		case SDL_EVENT_WINDOW_RESIZED:
+    		{
+    			Width = event.window.data1;
+    			Height = event.window.data2;
+    			WindowResizeEvent emmaEvent(Width, Height, WindowId);
+    			eventCallback(emmaEvent);
+    		}break;
+    		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    		case SDL_EVENT_WINDOW_METAL_VIEW_RESIZED:
+    		case SDL_EVENT_WINDOW_MINIMIZED:
+    		case SDL_EVENT_WINDOW_MAXIMIZED:
+    		case SDL_EVENT_WINDOW_RESTORED:
 				break;
-			case SDL_EVENT_WINDOW_RESIZED:
-				LOG_TRACE("Window resized: w:{0}, h:{1}", event.data1, event.data2);
+    		case SDL_EVENT_WINDOW_MOUSE_ENTER:
+    		{
+    			WindowMouseFocusEvent emmaEvent(WindowId, true);
+    			eventCallback(emmaEvent);
+    		}break;
+    		case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+    		{
+				WindowMouseFocusEvent emmaEvent(WindowId, false);
+    			eventCallback(emmaEvent);
+    		}break;
+    		case SDL_EVENT_WINDOW_FOCUS_GAINED:
+    		{
+    			WindowFocusEvent emmaEvent(WindowId, true);
+    			eventCallback(emmaEvent);
+    			HasFocus = true;
+    		}break;
+    		case SDL_EVENT_WINDOW_FOCUS_LOST:
+    		{
+    			WindowFocusEvent emmaEvent(WindowId, false);
+    			eventCallback(emmaEvent);
+    			HasFocus = false;
+    		}
 				break;
-			default:
+    		case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+    		{
+    			WindowCloseRequestEvent emmaEvent(WindowId);
+    			eventCallback(emmaEvent);
+    		}break;
+    		case SDL_EVENT_WINDOW_HIT_TEST:
+    		case SDL_EVENT_WINDOW_ICCPROF_CHANGED:
+    		case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+    		case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+    		case SDL_EVENT_WINDOW_SAFE_AREA_CHANGED:
+    		case SDL_EVENT_WINDOW_OCCLUDED:
+    		case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+    		case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+    		case SDL_EVENT_WINDOW_DESTROYED:
+    		case SDL_EVENT_WINDOW_HDR_STATE_CHANGED:
 				break;
 		}
 	}
 
-	unsigned int EmmaWindow::GetWidth() const
-	{
-		int w;
-		SDL_GetWindowSize(window, &w, nullptr);
-		return w;
-	}
-
-	unsigned int EmmaWindow::GetHeight() const
-	{
-		int h;
-		SDL_GetWindowSize(window, nullptr, &h);
-		return h;
-	}
-
-	void EmmaWindow::GetWindowSize(int *width, int *height) const
-	{
-		SDL_GetWindowSize(window, width, height);
-	}
-
 	void EmmaWindow::SetEventCallback(const EventCallbackFunc &callback)
 	{
-
+		eventCallback = callback;
 	}
 
-	void EmmaWindow::Shutdown()
+	void EmmaWindow::Shutdown() const
 	{
-		SDL_DestroyWindow(window);
+		SDL_DestroyWindow(Window);
 	}
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core.h"
-#include "SDL3/SDL_log.h"
-#include "spdlog/spdlog.h"
+#include "SDL_log.h"
+#include "spdlog.h"
 
 inline const char* SDL_LOG_CATEGORIES[] =
 {

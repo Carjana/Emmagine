@@ -1,8 +1,8 @@
 #include "Logger.h"
 
-#include "SDL3/SDL.h"
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include "SDL.h"
+#include "spdlog.h"
+#include "sinks/stdout_color_sinks.h"
 
 namespace Emma
 {
@@ -11,7 +11,7 @@ namespace Emma
 
 	void Logger::Init()
 	{
-		// https://github.com/gabime/spdlog/wiki/Custom-formatting
+		// https://github.com/gabime/wiki/Custom-formatting
 		spdlog::set_pattern("%^[%T][%l] %n: %v%$");
 
 		coreLogger = spdlog::stdout_color_mt("EMMA");

@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef PLATFORM_WINDOWS
-#include "SDL3/SDL_init.h"
+#include "SDL_init.h"
 
 int main(int argc, char** argv)
 {

@@ -24,5 +24,5 @@
 #if DEBUG
 	#define ASSERT(condition, ...) if(!condition) {LOG_INFO("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
 #else
-	#define assert(condition, ...)
+	#define ASSERT(condition, ...)
 #endif

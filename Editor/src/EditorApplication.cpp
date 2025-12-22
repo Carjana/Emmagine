@@ -2,7 +2,7 @@
 
 class EmmaEditor : public Emma::EmmaApplication
 {
-public:
+
 };
 
 Emma::EmmaApplication* Emma::CreateEmmaApplication()
