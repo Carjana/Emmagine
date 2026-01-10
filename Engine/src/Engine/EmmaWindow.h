@@ -6,6 +6,7 @@
 #include "SDL_events.h"
 #include "SDL_gpu.h"
 #include "SDL_video.h"
+#include "Events/WindowEvents.h"
 
 namespace Emma
 {
@@ -23,23 +24,23 @@ namespace Emma
 	public:
 		using EventCallbackFunc = std::function<void(Event&)>;
 
+		EmmaWindow(const WindowProps& props);
+		~EmmaWindow();
+
+		void OnEvent(Event &event);
+
+		unsigned int WindowId;
+		SDL_Window *Window;
+		SDL_GPUDevice *GPUDevice;
+
 		unsigned int Width;
 		unsigned int Height;
 
 		unsigned int X;
 		unsigned int Y;
 
-		EmmaWindow(const WindowProps& props);
-		~EmmaWindow();
-
-		void HandleEvent(const SDL_Event &event);
-
-		inline void SetEventCallback(const EventCallbackFunc &callback);
-
-		SDL_Window *Window;
-		SDL_GPUDevice *GPUDevice;
-		unsigned int WindowId;
 		bool HasFocus;
+		bool HasMouseFocus;
 
 		static EmmaWindow* CreateEmmaWindow(const WindowProps &props)
 		{
@@ -49,6 +50,11 @@ namespace Emma
 	private:
 		void Init(const WindowProps& props);
 		void Shutdown() const;
-		EventCallbackFunc eventCallback;
+
+		bool OnWindowMoveEvent(const WindowMoveEvent &event);
+		bool OnWindowResizeEvent(const WindowResizeEvent &event);
+		bool OnWindowMouseFocusEvent(const WindowMouseFocusEvent &event);
+		bool OnWindowFocusEvent(const WindowFocusEvent &event);
+		bool OnWindowCloseRequestEvent(WindowCloseRequestEvent &event);
 	};
 }

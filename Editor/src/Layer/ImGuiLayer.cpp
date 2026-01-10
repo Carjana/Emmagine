@@ -3,9 +3,7 @@
 #include "imgui.h"
 #include "SDL_time.h"
 #include "backends/imgui_impl_sdl3.h"
-#include "Engine/EmmaApplication.h"
-#include "Engine/Logger.h"
-#include "Engine/Events/MouseEvents.h"
+#include "Emmagine.h"
 
 #include "ImGui/ImGuiSDL3GPU.h"
 
@@ -22,9 +20,9 @@ namespace EmmaEditor
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
 		app = Emma::EmmaApplication::GetInstance();
-		Emma::EmmaWindow *window = app->mainWindow;
+		const Emma::EmmaWindow *window = app->mainWindow;
 
-		float mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+		const float mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.ScaleAllSizes(mainScale);
 		style.FontScaleDpi = mainScale;
@@ -40,6 +38,7 @@ namespace EmmaEditor
 		ImGui_ImplSDLGPU3_Init(&init_info);
 		LOG_INFO("Im Gui Context created")
 
+		io.DisplaySize = ImVec2((float)app->mainWindow->Width, (float)app->mainWindow->Height);
 	}
 
 	void ImGuiLayer::OnDetach()
@@ -51,51 +50,84 @@ namespace EmmaEditor
 	{
 		ImGuiIO io = ImGui::GetIO();
 
-		if (!(event.GetCategoryFlags() & (int)Emma::EventCategory::Mouse))
-			return;
+		Emma::EventDispatcher dispatcher(event);
+		dispatcher.DispatchEvent<Emma::MouseMovedEvent>(BIND_EVENT(ImGuiLayer::OnMouseMovedEvent));
+		dispatcher.DispatchEvent<Emma::MouseButtonEvent>(BIND_EVENT(ImGuiLayer::OnMouseButtonEvent));
+		dispatcher.DispatchEvent<Emma::MouseWheelEvent>(BIND_EVENT(ImGuiLayer::OnMouseWheelEvent));
+		dispatcher.DispatchEvent<Emma::KeyEvent>(BIND_EVENT(ImGuiLayer::OnKeyEvent));
+		dispatcher.DispatchEvent<Emma::KeyTextEvent>(BIND_EVENT(ImGuiLayer::OnKeyTextEvent));
+		dispatcher.DispatchEvent<Emma::WindowResizeEvent>(BIND_EVENT(ImGuiLayer::OnWindowResizeEvent));
+	}
 
-		switch (event.GetEventType())
-		{
-			case Emma::EventType::MouseMovedEvent:
-			{
-				Emma::MouseMovedEvent &mouseEvent = (Emma::MouseMovedEvent&)event;
-				io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-				io.AddMousePosEvent(mouseEvent.X, mouseEvent.Y);
-			}break;
-			case Emma::EventType::MouseButtonEvent:
-			{
-				Emma::MouseButtonEvent &mouseEvent = (Emma::MouseButtonEvent&)event;
-				int mouse_button = -1;
-				if (mouseEvent.ButtonID == Emma::MouseButton::Left) { mouse_button = 0; }
-				if (mouseEvent.ButtonID == Emma::MouseButton::Right) { mouse_button = 1; }
-				if (mouseEvent.ButtonID == Emma::MouseButton::Middle) { mouse_button = 2; }
-				if (mouseEvent.ButtonID == Emma::MouseButton::X1) { mouse_button = 3; }
-				if (mouseEvent.ButtonID == Emma::MouseButton::X2) { mouse_button = 4; }
-				if (mouse_button == -1)
-					break;
-				io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-				io.AddMouseButtonEvent(mouse_button, mouseEvent.IsPressed);
-			}break;
-			case Emma::EventType::MouseWheelEvent:
-			{
-				Emma::MouseWheelEvent &mouseEvent = (Emma::MouseWheelEvent&)event;
-				io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-				io.AddMouseWheelEvent(mouseEvent.X, mouseEvent.Y);
-			}break;
-		}
-		event.IsHandled = io.WantCaptureMouse;
+	bool ImGuiLayer::OnMouseMovedEvent(const Emma::MouseMovedEvent &event)
+	{
+		ImGuiIO &io = ImGui::GetIO();
+		io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+		io.AddMousePosEvent(event.X, event.Y);
+		return false;
+	}
+
+	bool ImGuiLayer::OnMouseButtonEvent(const Emma::MouseButtonEvent &event)
+	{
+		ImGuiIO &io = ImGui::GetIO();
+		int mouse_button = -1;
+		if (event.ButtonID == SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) { mouse_button = 0; }
+		if (event.ButtonID == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) { mouse_button = 1; }
+		if (event.ButtonID == SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) { mouse_button = 2; }
+		if (event.ButtonID == SDL_BUTTON_MASK(SDL_BUTTON_X1)){ mouse_button = 3; }
+		if (event.ButtonID == SDL_BUTTON_MASK(SDL_BUTTON_X2)) { mouse_button = 4; }
+		if (mouse_button == -1)
+			return false;
+		io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+		io.AddMouseButtonEvent(mouse_button, event.IsPressed);
+		return false;
+	}
+
+	bool ImGuiLayer::OnMouseWheelEvent(const Emma::MouseWheelEvent &event)
+	{
+		ImGuiIO &io = ImGui::GetIO();
+		io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+		io.AddMouseWheelEvent(event.X, event.Y);
+		return false;
+	}
+
+	bool ImGuiLayer::OnKeyEvent(const Emma::KeyEvent &event)
+	{
+		ImGuiIO &io = ImGui::GetIO();
+
+		io.AddKeyEvent(ImGuiMod_Ctrl, (event.Keymod & SDL_KMOD_CTRL) != 0);
+		io.AddKeyEvent(ImGuiMod_Shift, (event.Keymod & SDL_KMOD_SHIFT) != 0);
+		io.AddKeyEvent(ImGuiMod_Alt, (event.Keymod & SDL_KMOD_ALT) != 0);
+		io.AddKeyEvent(ImGuiMod_Super, (event.Keymod & SDL_KMOD_GUI) != 0);
+
+		const ImGuiKey key = SDLKeyToImGUIKey(event.Keycode);
+		io.AddKeyEvent(key, event.IsPressed);
+		io.SetKeyEventNativeData(key, (int)event.Keycode, (int)event.Scancode, (int)event.Scancode);
+		return false;
+	}
+
+	bool ImGuiLayer::OnWindowResizeEvent(const Emma::WindowResizeEvent &event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2((float)event.Width, (float)event.Height);
+		return false;
+	}
+
+	bool ImGuiLayer::OnKeyTextEvent(const Emma::KeyTextEvent &event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddInputCharactersUTF8(event.Text);
+		return false;
 	}
 
 	void ImGuiLayer::OnUpdate()
 	{
 		ImGui_ImplSDLGPU3_NewFrame();
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2((float)app->mainWindow->Width, (float)app->mainWindow->Height);
-
 
 		SDL_Time newTime;
 		SDL_GetCurrentTime(&newTime);
-		io.DeltaTime = time > 0.0f ? (newTime - time) : (1.0f / 60.0f);
+		io.DeltaTime = time > 0.0f ? ((float)(newTime - time)/(float)1000000000) : (1.0f / 60.0f);
 		time = newTime;
 
 
@@ -107,7 +139,7 @@ namespace EmmaEditor
 
 		ImDrawData *drawData = ImGui::GetDrawData();
 
-		Emma::EmmaWindow *window = app->mainWindow;
+		const Emma::EmmaWindow *window = app->mainWindow;
 
 		SDL_GPUCommandBuffer* command_buffer = SDL_AcquireGPUCommandBuffer(window->GPUDevice); // Acquire a GPU command buffer
 

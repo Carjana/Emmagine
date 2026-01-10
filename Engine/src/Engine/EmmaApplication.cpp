@@ -1,36 +1,50 @@
 #include "EmmaApplication.h"
 
+#include "EmmaInput.h"
 #include "Logger.h"
 #include "Events/MouseEvents.h"
 #include "SDL_events.h"
 #include "SDL_init.h"
+#include "Events/KeyboardEvents.h"
 
 namespace Emma
 {
-
-#define BIND_EVENT_FN(x) std::bind(&EmmaApplication::x, this, std::placeholders::_1)
 
 	EmmaApplication* EmmaApplication::Instance = nullptr;
 
 	EmmaApplication::EmmaApplication()
 	{
 		Instance = this;
-		mainWindow = EmmaWindow::CreateEmmaWindow(WindowProps("Emmagine", 1280, 720));
-		mainWindow->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		CreateEmmaWindow(WindowProps("Emmagine", 1280, 720));
 	}
 
 	EmmaApplication::~EmmaApplication()
 	{
-		if (mainWindow)
+		if (mainWindow != nullptr)
 			delete mainWindow;
+	}
+
+	void EmmaApplication::CreateEmmaWindow(const WindowProps &props)
+	{
+		// TODO: handle multiple windows
+		mainWindow = EmmaWindow::CreateEmmaWindow(props);
+	}
+
+	void EmmaApplication::DestroyEmmaWindow()
+	{
+		// TODO: Queue deletion
+		// TODO: handle multiple windows
+		Quit();
 	}
 
 	void EmmaApplication::OnEvent(Event& event)
 	{
 		if (EventShouldLog[(char)event.GetEventType()])
-		LOG_TRACE(event.ToString());
-		EventDispatcher dispatcher(event);
-		dispatcher.DispatchEvent<WindowCloseRequestEvent>(BIND_EVENT_FN(OnWindowCloseRequestEvent));
+			LOG_TRACE(event.ToString());
+
+		// Maybe put windows in an extra window layer?
+		if (event.WindowId == mainWindow->WindowId)
+			mainWindow->OnEvent(event);
 
 		for (std::vector<Layer *>::iterator it = layerStack.end(); it != layerStack.begin();)
 		{
@@ -40,14 +54,9 @@ namespace Emma
 		}
 	}
 
-	bool EmmaApplication::OnWindowCloseRequestEvent(const WindowCloseRequestEvent &event)
+	void EmmaApplication::Quit()
 	{
-		assert(mainWindow);
-		if (mainWindow->WindowId == event.WindowId)
-		{
-			isRunning = false;
-		}
-		return true;
+		isRunning = false;
 	}
 
 	void EmmaApplication::PushLayer(Layer *layer)
@@ -64,21 +73,56 @@ namespace Emma
 
 	void EmmaApplication::Run()
 	{
-		Init();
+		OnInit();
 		while (isRunning)
 		{
 			SDL_Event event;
 			while (SDL_PollEvent(&event))
 			{
 				// Handle Events
-				mainWindow->HandleEvent(event);
 				switch (event.type)
 				{
+					case SDL_EVENT_WINDOW_MOVED:
+					{
+						WindowMoveEvent emmaEvent(event.window.windowID, event.window.data1, event.window.data2);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_WINDOW_RESIZED:
+					{
+						WindowResizeEvent emmaEvent(event.window.windowID, event.window.data1, event.window.data2);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_WINDOW_MOUSE_ENTER:
+					{
+						WindowMouseFocusEvent emmaEvent(event.window.windowID, true);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+					{
+						WindowMouseFocusEvent emmaEvent(event.window.windowID, false);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_WINDOW_FOCUS_GAINED:
+					{
+						WindowFocusEvent emmaEvent(event.window.windowID, true);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_WINDOW_FOCUS_LOST:
+					{
+						WindowFocusEvent emmaEvent(event.window.windowID, false);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+					{
+						WindowCloseRequestEvent emmaEvent(event.window.windowID);
+						OnEvent(emmaEvent);
+					}break;
+
 					case SDL_EVENT_MOUSE_MOTION:
 					{
 						if (mainWindow->HasFocus)
 						{
-							MouseMovedEvent mouseEvent(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel, event.motion.x / (float)mainWindow->Width, event.motion.y / (float)mainWindow->Height);
+							MouseMovedEvent mouseEvent(event.motion.windowID, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel, event.motion.x / (float)mainWindow->Width, event.motion.y / (float)mainWindow->Height);
 							OnEvent(mouseEvent);
 						}
 					}
@@ -86,34 +130,23 @@ namespace Emma
 					case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					case SDL_EVENT_MOUSE_BUTTON_UP:
 					{
-						MouseButton button = MouseButton::Left;
-						switch (event.button.button)
-						{
-							case SDL_BUTTON_LEFT:
-								button = MouseButton::Left;
-								break;
-							case SDL_BUTTON_MIDDLE:
-								button = MouseButton::Middle;
-								break;
-							case SDL_BUTTON_RIGHT:
-								button = MouseButton::Right;
-								break;
-							case SDL_BUTTON_X1:
-								button = MouseButton::X1;
-								break;
-							case SDL_BUTTON_X2:
-								button = MouseButton::X2;
-								break;
-							default:
-								ASSERT(false, "Invalid code path!");
-								break;
-						}
-						MouseButtonEvent emmaEvent(button, event.button.down);
+						MouseButtonEvent emmaEvent(event.button.windowID, SDL_BUTTON_MASK(event.button.button), event.button.down);
 						OnEvent(emmaEvent);
 					}break;
 					case SDL_EVENT_MOUSE_WHEEL:
 					{
-						MouseWheelEvent emmaEvent(event.wheel.x, event.wheel.y);
+						MouseWheelEvent emmaEvent(event.wheel.windowID, event.wheel.x, event.wheel.y);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_KEY_DOWN:
+					case SDL_EVENT_KEY_UP:
+					{
+						KeyEvent emmaEvent(event.key.windowID, event.key.key, event.key.scancode, event.key.mod, event.key.down);
+						OnEvent(emmaEvent);
+					}break;
+					case SDL_EVENT_TEXT_INPUT:
+					{
+						KeyTextEvent emmaEvent(event.text.windowID, event.text.text);
 						OnEvent(emmaEvent);
 					}break;
 				}
@@ -121,7 +154,11 @@ namespace Emma
 
 			for (Layer *layer : layerStack)
 				layer->OnUpdate();
+
+			for (Layer *layer : layerStack)
+				layer->OnRender();
 		}
+		OnQuit();
 		SDL_Quit();
 	}
 

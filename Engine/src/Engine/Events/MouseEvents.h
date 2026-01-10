@@ -4,14 +4,6 @@
 
 namespace Emma
 {
-	enum class MouseButton : char
-	{
-		Left = BIT(1),
-		Middle = BIT(2),
-		Right = BIT(3),
-		X1 = BIT(4),
-		X2 = BIT(5)
-	};
 	class EMMA_API MouseMovedEvent : public Event
 	{
 	public:
@@ -22,10 +14,10 @@ namespace Emma
 		const float XFrac;
 		const float YFrac;
 
-		MouseMovedEvent(const float x, const float y,
+		MouseMovedEvent(const unsigned int windowID, const float x, const float y,
 			const float xRel, const float yRel,
-			const float xFrac, const float yFrac):
-		X(x), Y(y),
+			const float xFrac, const float yFrac) :
+		Event(windowID), X(x), Y(y),
 		XRel(xRel), YRel(yRel),
 		XFrac(xFrac), YFrac(yFrac){}
 
@@ -42,10 +34,10 @@ namespace Emma
 	class EMMA_API MouseButtonEvent : public Event
 	{
 	public:
-		MouseButton ButtonID;
+		SDL_MouseButtonFlags ButtonID;
 		bool IsPressed;
 
-		MouseButtonEvent(const MouseButton buttonID, const bool isPressed) : ButtonID(buttonID), IsPressed(isPressed) {}
+		MouseButtonEvent(const unsigned int windowID, const SDL_MouseButtonFlags buttonID, const bool isPressed) : Event(windowID), ButtonID(buttonID), IsPressed(isPressed) {}
 
 		std::string ToString() override
 		{
@@ -54,19 +46,19 @@ namespace Emma
 			stream << GetName();
 			switch (ButtonID)
 			{
-				case MouseButton::Left:
+				case SDL_BUTTON_MASK(SDL_BUTTON_LEFT):
 					stream << ", ButtonID: Left";
 					break;
-				case MouseButton::Middle:
+				case SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE):
 					stream << ", ButtonID: Middle";
 					break;
-				case MouseButton::Right:
+				case SDL_BUTTON_MASK(SDL_BUTTON_RIGHT):
 					stream << ", ButtonID: Right";
 					break;
-				case MouseButton::X1:
+				case SDL_BUTTON_MASK(SDL_BUTTON_X1):
 					stream << ", ButtonID: X1";
 					break;
-				case MouseButton::X2:
+				case SDL_BUTTON_MASK(SDL_BUTTON_X2):
 					stream << ", ButtonID: X2";
 					break;
 			}
@@ -84,7 +76,8 @@ namespace Emma
 		float X;
 		float Y;
 
-		MouseWheelEvent(const float x, const float y) : X(x), Y(y) {}
+		MouseWheelEvent(const unsigned int windowID, const float x, const float y) : Event(windowID), X(x), Y(y)
+		{}
 
 		std::string ToString() override
 		{

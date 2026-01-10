@@ -16,13 +16,18 @@
 	#define EMMA_API DLL_IMPORT
 #endif
 
+#if DEBUG
+	#define ASSERT(condition, ...) if(!(condition)) {LOG_ERROR("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
+	#define ASSERT_FUNC(function, ...) ASSERT((function), __VA_ARGS__)
+#else
+	#define ASSERT(condition, ...)
+	#define ASSERT_FUNC(function, ...) function
+#endif
+
 #define BIT(x) (1 << x)
 
 #define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
 
+#define BIND_EVENT(fn) std::bind(&fn, this, std::placeholders::_1)
 
-#if DEBUG
-	#define ASSERT(condition, ...) if(!(condition)) {LOG_ERROR("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
-#else
-	#define ASSERT(condition, ...)
-#endif
+

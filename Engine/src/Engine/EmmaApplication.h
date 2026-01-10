@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
 #include "EmmaWindow.h"
-#include "Events/WindowEvents.h"
 #include "Layer/Layer.h"
 #include "Layer/LayerStack.h"
 
@@ -13,10 +12,14 @@ namespace Emma
 		EmmaApplication();
 		virtual ~EmmaApplication();
 
-		virtual void Init() {}
+		void CreateEmmaWindow(const WindowProps &props);
+		void DestroyEmmaWindow();
+
+		virtual void OnInit() {}
+		virtual void OnQuit() {}
 
 		void OnEvent(Event &event);
-		bool OnWindowCloseRequestEvent(const WindowCloseRequestEvent &event);
+		void Quit();
 
 		void PushLayer(Layer *layer);
 

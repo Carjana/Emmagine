@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef PLATFORM_WINDOWS
 #include "SDL_init.h"
 
 int main(int argc, char** argv)
@@ -12,5 +11,3 @@ int main(int argc, char** argv)
 	delete app;
 	return 0;
 }
-
-#endif

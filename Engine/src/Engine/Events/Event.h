@@ -16,7 +16,12 @@ namespace Emma
 		MouseMovedEvent,
 		MouseButtonEvent,
 		MouseWheelEvent,
-		EventTypeCount
+
+	// Keyboad Events
+		KeyEvent,
+		KeyTextEvent,
+
+		EventTypeCount,
 	};
 
 	enum class EventCategory
@@ -24,6 +29,7 @@ namespace Emma
 		None = 0,
 		Application = BIT(1),
 		Mouse = BIT(2),
+		Keyboard = BIT(3),
 	};
 
 	inline const char* EventTypeName[] = {
@@ -35,7 +41,10 @@ namespace Emma
 
 		"MouseMovedEvent",
 		"MouseButtonEvent",
-		"MouseWheelEvent"
+		"MouseWheelEvent",
+
+		"KeyEvent",
+		"KeyTextEvent",
 	};
 	static_assert(ArrayCount(EventTypeName) == (int)EventType::EventTypeCount);
 
@@ -49,11 +58,14 @@ namespace Emma
 		EventCategory::Mouse,			// Mouse Moved
 		EventCategory::Mouse,			// Mouse Button
 		EventCategory::Mouse,			// Mouse Wheel
+		EventCategory::Keyboard,			// Key Event
+		EventCategory::Keyboard			// KeyText Event
 	};
 	static_assert(ArrayCount(EventCategoryFlags) == (int)EventType::EventTypeCount);
 
 inline constexpr bool EventShouldLog[]
 {
+	// TODO:: Move this to a like config class or something, so it can be toggled in the editor
 	false,	// Window Move
 	false,	// Window Resize
 	false,	// Window Close
@@ -62,6 +74,8 @@ inline constexpr bool EventShouldLog[]
 	false,	// Mouse Moved
 	false,	// Mouse Button
 	false, 	// Mouse Wheel
+	false,	// Key Event
+	false,	// KeyText Event
 };
 	static_assert(ArrayCount(EventShouldLog) == (int)EventType::EventTypeCount);
 
@@ -76,7 +90,9 @@ inline constexpr bool EventShouldLog[]
 	{
 		friend class EventDispatcher;
 	public:
-		virtual ~Event() {};
+
+		Event(const unsigned int windowID) : WindowId(windowID) {};
+		virtual ~Event(){};
 
 		virtual EventType GetEventType() = 0;
 		virtual int GetCategoryFlags() = 0;
@@ -86,6 +102,7 @@ inline constexpr bool EventShouldLog[]
 			return GetName();
 		};
 
+		unsigned int WindowId;
 		bool IsHandled = false;
 	};
 
