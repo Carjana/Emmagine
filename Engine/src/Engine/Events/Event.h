@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Core.h"
-#include "fmt/bundled/base.h"
+#include "spdlog/fmt/bundled/base.h"
 
 namespace Emma
 {

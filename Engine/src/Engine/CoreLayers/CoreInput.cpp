@@ -1,6 +1,6 @@
 #include "CoreInput.h"
 
-#include "SDL_keyboard.h"
+#include "../../../../dependencies/SDL3/SDL_keyboard.h"
 
 namespace Emma
 {

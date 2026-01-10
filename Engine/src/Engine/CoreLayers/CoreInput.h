@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SDL_keycode.h"
-#include "SDL_mouse.h"
-#include "SDL_scancode.h"
+#include "../../../../dependencies/SDL3/SDL_keycode.h"
+#include "../../../../dependencies/SDL3/SDL_mouse.h"
+#include "../../../../dependencies/SDL3/SDL_scancode.h"
 #include "Engine/Layer/Layer.h"
 
 namespace Emma

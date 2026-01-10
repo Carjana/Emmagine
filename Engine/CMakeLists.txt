@@ -5,9 +5,10 @@ add_library(Engine SHARED ${Engine_SRC})
 target_include_directories(Engine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/dependencies/SDL3/includes
-        ${CMAKE_SOURCE_DIR}/dependencies/spdlog/includes
-        ${CMAKE_SOURCE_DIR}/dependencies/ImGui
+        ${CMAKE_SOURCE_DIR}/dependencies
+        #${CMAKE_SOURCE_DIR}/dependencies/SDL3/includes
+        #${CMAKE_SOURCE_DIR}/dependencies/spdlog/includes
+        #${CMAKE_SOURCE_DIR}/dependencies/ImGui
 )
 
 if (MSVC)

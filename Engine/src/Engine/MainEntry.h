@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL_init.h"
+#include "../../../dependencies/SDL3/SDL_init.h"
 
 int main(int argc, char** argv)
 {

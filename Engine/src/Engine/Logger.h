@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Core.h"
-#include "SDL_log.h"
-#include "spdlog.h"
-#include "fmt/ostr.h"
+#include "../../../dependencies/SDL3/SDL_log.h"
+#include "../../../dependencies/spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h"
 
 inline const char* SDL_LOG_CATEGORIES[] =
 {

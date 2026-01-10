@@ -3,9 +3,9 @@
 #include "emmapch.h"
 #include "Core.h"
 #include "Events/Event.h"
-#include "SDL_events.h"
-#include "SDL_gpu.h"
-#include "SDL_video.h"
+#include "../../../dependencies/SDL3/SDL_events.h"
+#include "../../../dependencies/SDL3/SDL_gpu.h"
+#include "../../../dependencies/SDL3/SDL_video.h"
 #include "Events/WindowEvents.h"
 
 namespace Emma

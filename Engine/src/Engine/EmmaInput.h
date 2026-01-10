@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core.h"
-#include "SDL_events.h"
-#include "SDL_keycode.h"
+#include "../../../dependencies/SDL3/SDL_events.h"
+#include "../../../dependencies/SDL3/SDL_keycode.h"
 
 namespace Emma
 {

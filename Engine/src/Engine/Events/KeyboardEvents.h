@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Event.h"
-#include "SDL_keycode.h"
+#include "SDL3/SDL_keycode.h"
 #include "emmapch.h"
-#include "SDL_keyboard.h"
+#include "../../../../dependencies/SDL3/SDL_keyboard.h"
 
 namespace Emma
 {
