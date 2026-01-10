@@ -1,6 +1,6 @@
 #include "Emmagine.h"
 #include "Engine/MainEntry.h"
-#include "Layer/ImGuiLayer.h"
+#include "Layer/ExampleEditorLayer.h"
 
 
 namespace EmmaEditor
@@ -9,8 +9,8 @@ namespace EmmaEditor
 	{
 		void OnInit() override
 		{
-			Emma::Layer *layer = new ImGuiLayer();
-			PushLayer(layer);
+			ImGui::SetCurrentContext(GetImGuiContext());
+			PushLayer(new ExampleEditorLayer());
 		}
 		void OnQuit() override
 		{

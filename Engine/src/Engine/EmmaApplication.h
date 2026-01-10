@@ -1,6 +1,9 @@
 #pragma once
 #include "Core.h"
 #include "EmmaWindow.h"
+#include "imgui_internal.h"
+#include "CoreLayers/CoreInput.h"
+#include "CoreLayers/ImGuiLayer.h"
 #include "Layer/Layer.h"
 #include "Layer/LayerStack.h"
 
@@ -22,7 +25,6 @@ namespace Emma
 		void Quit();
 
 		void PushLayer(Layer *layer);
-
 		void PopLayer(Layer *layer);
 
 		virtual void Run();
@@ -30,6 +32,10 @@ namespace Emma
 		bool isRunning = true;
 		EmmaWindow *mainWindow;
 
+		CoreInput *coreInputLayer;
+		ImGuiLayer *imGuiLayer;
+
+		static ImGuiContext *GetImGuiContext() { return ImGui::GetCurrentContext(); }
 
 		static EmmaApplication *GetInstance(){return Instance;}
 

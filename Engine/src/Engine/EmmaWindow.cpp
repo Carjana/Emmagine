@@ -36,7 +36,7 @@ namespace Emma
 		ASSERT(GPUDevice, "GPU Device Creation Failed!", SDL_GetError());
 		ASSERT_FUNC(SDL_ClaimWindowForGPUDevice(GPUDevice, Window), "Failed to claim window for GPU Device!", SDL_GetError());
 
-		SDL_SetGPUSwapchainParameters(GPUDevice, Window, SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_MAILBOX);
+		SDL_SetGPUSwapchainParameters(GPUDevice, Window, SDL_SWAPCHAIN_COMPOSITION, SDL_PRESENT_MODE);
 	}
 
 	void EmmaWindow::Shutdown() const

@@ -16,6 +16,11 @@ namespace Emma
 	{
 		Instance = this;
 		CreateEmmaWindow(WindowProps("Emmagine", 1280, 720));
+
+		imGuiLayer = new ImGuiLayer();
+		coreInputLayer = new CoreInput();
+		PushLayer(coreInputLayer);
+		PushLayer(imGuiLayer);
 	}
 
 	EmmaApplication::~EmmaApplication()
@@ -79,6 +84,7 @@ namespace Emma
 			SDL_Event event;
 			while (SDL_PollEvent(&event))
 			{
+				imGuiLayer->HandleSDLEvent(event);
 				// Handle Events
 				switch (event.type)
 				{
@@ -155,8 +161,10 @@ namespace Emma
 			for (Layer *layer : layerStack)
 				layer->OnUpdate();
 
+			imGuiLayer->Begin();
 			for (Layer *layer : layerStack)
-				layer->OnRender();
+				layer->OnRenderImGui();
+			imGuiLayer->End();
 		}
 		OnQuit();
 		SDL_Quit();

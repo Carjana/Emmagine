@@ -19,6 +19,9 @@ namespace Emma
 			: Title(title), Width(width), Height(height) {}
 	};
 
+	static constexpr SDL_GPUSwapchainComposition SDL_SWAPCHAIN_COMPOSITION = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
+	static constexpr SDL_GPUPresentMode SDL_PRESENT_MODE = SDL_GPU_PRESENTMODE_MAILBOX;
+
 	class EMMA_API EmmaWindow
 	{
 	public:

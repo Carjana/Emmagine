@@ -7,6 +7,7 @@ target_include_directories(Engine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/dependencies/SDL3/includes
         ${CMAKE_SOURCE_DIR}/dependencies/spdlog/includes
+        ${CMAKE_SOURCE_DIR}/dependencies/ImGui
 )
 
 if (MSVC)
@@ -23,5 +24,6 @@ target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/spdlog)
 target_link_libraries(Engine PUBLIC SDL3)
 target_link_libraries(Engine PUBLIC spdlogd)
 target_link_libraries(Engine PUBLIC glm::glm-header-only)
+target_link_libraries(Engine PUBLIC ImGui)
 
 add_dependencies(Engine CopySDL)
