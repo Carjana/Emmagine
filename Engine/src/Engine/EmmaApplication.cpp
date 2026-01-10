@@ -1,15 +1,15 @@
 #include "EmmaApplication.h"
 
 #include "EmmaInput.h"
-#include "Logger.h"
 #include "Events/MouseEvents.h"
+#include "Events/KeyboardEvents.h"
 #include "SDL_events.h"
 #include "SDL_init.h"
-#include "Events/KeyboardEvents.h"
+
+#include "Logger.h"
 
 namespace Emma
 {
-
 	EmmaApplication* EmmaApplication::Instance = nullptr;
 
 	EmmaApplication::EmmaApplication()
@@ -40,7 +40,7 @@ namespace Emma
 	void EmmaApplication::OnEvent(Event& event)
 	{
 		if (EventShouldLog[(char)event.GetEventType()])
-			LOG_TRACE(event.ToString());
+			LOG_TRACE(event);
 
 		// Maybe put windows in an extra window layer?
 		if (event.WindowId == mainWindow->WindowId)

@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "SDL_log.h"
 #include "spdlog.h"
+#include "fmt/ostr.h"
 
 inline const char* SDL_LOG_CATEGORIES[] =
 {

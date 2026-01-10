@@ -83,6 +83,8 @@ namespace Emma
 
 	bool EmmaWindow::OnWindowCloseRequestEvent(WindowCloseRequestEvent &event)
 	{
+		if (event.WindowId != WindowId)
+			return false;
 		EmmaApplication::GetInstance()->DestroyEmmaWindow();
 		return false;
 	}

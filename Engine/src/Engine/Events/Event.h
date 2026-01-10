@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Core.h"
+#include "fmt/bundled/base.h"
 
 namespace Emma
 {
@@ -82,8 +83,8 @@ inline constexpr bool EventShouldLog[]
 #define ADD_VAR(Var) << ", " << #Var << ": " << Var
 #define SETUP_EVENT_TYPE(eventType) \
 	EventType GetEventType() override {return eventType;} \
-	int GetCategoryFlags() override {return (int)EventCategoryFlags[(int)eventType];} \
-	const char *GetName() override {return EventTypeName[(int)eventType];} \
+	int GetCategoryFlags() const override {return (int)EventCategoryFlags[(int)eventType];} \
+	const char *GetName() const override {return EventTypeName[(int)eventType];} \
 	static EventType GetStaticEventType() {return eventType;}
 
 	class EMMA_API Event
@@ -95,9 +96,9 @@ inline constexpr bool EventShouldLog[]
 		virtual ~Event(){};
 
 		virtual EventType GetEventType() = 0;
-		virtual int GetCategoryFlags() = 0;
-		virtual const char* GetName() = 0;
-		virtual std::string ToString()
+		virtual int GetCategoryFlags() const = 0;
+		virtual const char* GetName() const = 0;
+		virtual std::string ToString() const
 		{
 			return GetName();
 		};
@@ -129,4 +130,7 @@ inline constexpr bool EventShouldLog[]
 	private:
 		Event &event;
 	};
+
 }
+
+CUSTOM_FORMAT(Emma::Event, "{}", input.ToString());

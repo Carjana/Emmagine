@@ -4,3 +4,4 @@ add_custom_target(CopySDL ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
 )
 
 add_subdirectory(ImGui)
+add_subdirectory(GlMathematics)

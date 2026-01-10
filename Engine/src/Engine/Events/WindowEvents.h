@@ -11,7 +11,7 @@ namespace Emma
 
 		WindowMoveEvent(const unsigned int windowId, const int x,const int y) : Event(windowId), xPos(x), yPos(y) {}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(WindowId) ADD_VAR(xPos) ADD_VAR(yPos);
@@ -29,7 +29,7 @@ namespace Emma
 
 		WindowResizeEvent(const unsigned int windowId, const int w, const int h) : Event(windowId), Width(w), Height(h) {}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(WindowId) ADD_VAR(Width) ADD_VAR(Height);
@@ -45,7 +45,7 @@ namespace Emma
 
 		WindowCloseRequestEvent(const unsigned int windowId) : Event(windowId){}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(WindowId);
@@ -61,7 +61,7 @@ namespace Emma
 		bool gainedFocus;
 		WindowFocusEvent(const unsigned int windowId, const bool gainedFocus) : Event(windowId), gainedFocus(gainedFocus){}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(WindowId) ADD_VAR(gainedFocus);
@@ -77,7 +77,7 @@ namespace Emma
 		bool gainedFocus;
 		WindowMouseFocusEvent(const unsigned int windowId, const bool gainedFocus) : Event(windowId), gainedFocus(gainedFocus){}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(WindowId) ADD_VAR(gainedFocus);

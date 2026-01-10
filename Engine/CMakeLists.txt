@@ -22,5 +22,6 @@ target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/spdlog)
 
 target_link_libraries(Engine PUBLIC SDL3)
 target_link_libraries(Engine PUBLIC spdlogd)
+target_link_libraries(Engine PUBLIC glm::glm-header-only)
 
 add_dependencies(Engine CopySDL)

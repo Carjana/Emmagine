@@ -30,4 +30,19 @@
 
 #define BIND_EVENT(fn) std::bind(&fn, this, std::placeholders::_1)
 
+// Custom fmt formatter to format type. Use "input" to refer to the input variable.
+#define CUSTOM_FORMAT(type, ...)\
+template <>\
+struct fmt::formatter<type> {\
+	constexpr auto parse(format_parse_context& ctx) {\
+		return ctx.begin();\
+	}\
+\
+	template <typename FormatContext>\
+	auto format(const type& input, FormatContext& ctx) const {\
+		return fmt::format_to(ctx.out(), __VA_ARGS__);\
+	}\
+};
 
+#include "fmt/bundled/base.h"
+#include "Math/Mathdefines.h"

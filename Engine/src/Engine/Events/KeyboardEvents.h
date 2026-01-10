@@ -19,7 +19,7 @@ namespace Emma
 		KeyEvent(unsigned int windowID, const SDL_Keycode keycode, const SDL_Scancode scancode, const SDL_Keymod keymod, const bool isPressed)
 		: Event(windowID), Keycode(keycode), Scancode(scancode), Keymod(keymod), IsPressed(isPressed) {}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() << ", " << SDL_GetKeyName(Keycode) ADD_VAR(IsPressed);
@@ -38,7 +38,7 @@ namespace Emma
 		KeyTextEvent(const unsigned int windowID, const char* text)
 		: Event(windowID), Text(text) {}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() << ", " << "Text: " << Text;

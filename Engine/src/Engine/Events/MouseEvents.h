@@ -21,7 +21,7 @@ namespace Emma
 		XRel(xRel), YRel(yRel),
 		XFrac(xFrac), YFrac(yFrac){}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(X) ADD_VAR(Y) ADD_VAR(XRel) ADD_VAR(YRel) ADD_VAR(XFrac) ADD_VAR(YFrac);
@@ -39,7 +39,7 @@ namespace Emma
 
 		MouseButtonEvent(const unsigned int windowID, const SDL_MouseButtonFlags buttonID, const bool isPressed) : Event(windowID), ButtonID(buttonID), IsPressed(isPressed) {}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 
@@ -79,7 +79,7 @@ namespace Emma
 		MouseWheelEvent(const unsigned int windowID, const float x, const float y) : Event(windowID), X(x), Y(y)
 		{}
 
-		std::string ToString() override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
 			stream << GetName() ADD_VAR(X) ADD_VAR(Y);
