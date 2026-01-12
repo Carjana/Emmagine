@@ -6,13 +6,10 @@ target_include_directories(Engine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/dependencies
-        #${CMAKE_SOURCE_DIR}/dependencies/SDL3/includes
-        #${CMAKE_SOURCE_DIR}/dependencies/spdlog/includes
-        #${CMAKE_SOURCE_DIR}/dependencies/ImGui
 )
 
 if (MSVC)
-target_compile_options(Engine PRIVATE /permissive- /W4)
+target_compile_options(Engine PRIVATE /permissive- /W4 /Zi)
 endif ()
 
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/emmapch.h)

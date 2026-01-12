@@ -34,7 +34,6 @@ namespace Emma
 		// TODO: handle multiple windows
 		mainWindow = EmmaWindow::CreateEmmaWindow(props);
 	}
-
 	void EmmaApplication::DestroyEmmaWindow()
 	{
 		// TODO: Queue deletion
