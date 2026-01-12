@@ -1,8 +1,5 @@
 #include "EmmaInput.h"
 
-#include "SDL3/SDL_events.h"
-#include "SDL3/SDL_keycode.h"
-
 namespace Emma
 {
 	inline bool EmmaInput::IsKeyPressed(SDL_Keycode keycode)

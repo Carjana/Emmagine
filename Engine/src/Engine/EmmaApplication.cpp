@@ -3,8 +3,8 @@
 #include "EmmaInput.h"
 #include "Events/MouseEvents.h"
 #include "Events/KeyboardEvents.h"
-#include "../../../dependencies/SDL3/SDL_events.h"
-#include "../../../dependencies/SDL3/SDL_init.h"
+#include "SDL3/SDL_events.h"
+#include "SDL3/SDL_init.h"
 
 #include "Logger.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../../dependencies/SDL3/SDL_events.h"
+#include "SDL3/SDL_events.h"
 #include "Engine/Layer/Layer.h"
 
 namespace Emma

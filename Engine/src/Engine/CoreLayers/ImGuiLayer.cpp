@@ -4,7 +4,6 @@
 
 #include "imgui.h"
 
-#define IMGUI_IMPL_API
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_sdlgpu3.h"
 

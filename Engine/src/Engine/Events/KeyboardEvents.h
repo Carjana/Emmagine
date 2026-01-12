@@ -3,7 +3,7 @@
 #include "Event.h"
 #include "SDL3/SDL_keycode.h"
 #include "emmapch.h"
-#include "../../../../dependencies/SDL3/SDL_keyboard.h"
+#include "SDL3/SDL_keyboard.h"
 
 namespace Emma
 {

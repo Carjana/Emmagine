@@ -1,7 +1,6 @@
 #include "Logger.h"
 
 #include "SDL3/SDL.h"
-#include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace Emma

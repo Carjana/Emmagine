@@ -7,7 +7,7 @@
 #include <cassert>
 #include <vector>
 
-#include "common.h"
+#include "spdlog/common.h"
 
 namespace spdlog {
 namespace details {
