@@ -10,10 +10,14 @@
 	#error "Platform not supported!"
 #endif
 
-#ifdef EMMA_BUILD_DLL
-	#define EMMA_API DLL_EXPORT
+#ifdef EMMA_DYNAMIC_LIBRARY
+	#ifdef EMMA_BUILD_DLL
+		#define EMMA_API DLL_EXPORT
+	#else
+		#define EMMA_API DLL_IMPORT
+	#endif
 #else
-	#define EMMA_API DLL_IMPORT
+	#define EMMA_API
 #endif
 
 #if DEBUG

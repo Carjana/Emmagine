@@ -1,6 +1,6 @@
 file(GLOB_RECURSE Engine_SRC CONFIGURE_DEPENDS "*.cpp" "*.h")
 
-add_library(Engine SHARED ${Engine_SRC})
+add_library(Engine STATIC ${Engine_SRC})
 
 target_include_directories(Engine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -9,11 +9,13 @@ target_include_directories(Engine PUBLIC
 )
 
 if (MSVC)
-target_compile_options(Engine PRIVATE /permissive- /W4 /Zi)
+target_compile_options(Engine PRIVATE /permissive- /W3 /Zi)
 endif ()
 
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/emmapch.h)
 
+
+#target_compile_definitions(Engine PRIVATE EMMA_DYNAMIC_LIBRARY)
 target_compile_definitions(Engine PRIVATE EMMA_BUILD_DLL)
 
 target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/SDL3)

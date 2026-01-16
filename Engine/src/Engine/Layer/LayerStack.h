@@ -16,7 +16,9 @@ namespace Emma
 		std::vector<Layer*>::iterator begin() {return layers.begin();};
 		std::vector<Layer*>::iterator end() {return layers.end();};
 
-	private:
+		std::vector<Layer*>::reverse_iterator rbegin() {return layers.rbegin();};
+		std::vector<Layer*>::reverse_iterator rend() {return layers.rend();};
+
 		std::vector<Layer*> layers;
 	};
 }

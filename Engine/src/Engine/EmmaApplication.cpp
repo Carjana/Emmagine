@@ -83,6 +83,7 @@ namespace Emma
 			SDL_Event event;
 			while (SDL_PollEvent(&event))
 			{
+				// maybe handle events via emma events;
 				imGuiLayer->HandleSDLEvent(event);
 				// Handle Events
 				switch (event.type)
@@ -154,15 +155,17 @@ namespace Emma
 						KeyTextEvent emmaEvent(event.text.windowID, event.text.text);
 						OnEvent(emmaEvent);
 					}break;
+					default:
+						break;
 				}
 			}
 
-			for (Layer *layer : layerStack)
-				layer->OnUpdate();
+			for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
+				layerStack.layers[i]->OnUpdate();
 
 			imGuiLayer->Begin();
-			for (Layer *layer : layerStack)
-				layer->OnRenderImGui();
+			for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
+				layerStack.layers[i]->OnRenderImGui();
 			imGuiLayer->End();
 		}
 		OnQuit();

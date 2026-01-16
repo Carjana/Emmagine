@@ -9,7 +9,6 @@ namespace EmmaEditor
 	{
 		void OnInit() override
 		{
-			ImGui::SetCurrentContext(GetImGuiContext());
 			PushLayer(new ExampleEditorLayer());
 		}
 		void OnQuit() override

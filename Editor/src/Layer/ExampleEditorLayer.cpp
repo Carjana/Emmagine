@@ -6,8 +6,10 @@ namespace EmmaEditor
 {
 	void ExampleEditorLayer::OnRenderImGui()
 	{
-		bool isOpen = true;
-		ImGui::Begin("Example", &isOpen);
+		static bool show = true;
+		if (show == false)
+			return;
+		ImGui::Begin("Example", &show);
 		ImGui::Text("Hello from ExampleEditorLayer!");
 		ImGui::End();
 	}
