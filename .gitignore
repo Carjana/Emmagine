@@ -11,4 +11,5 @@ CTestTestfile.cmake
 _deps
 
 *.idea
+*.vs
 out
