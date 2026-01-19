@@ -59,24 +59,16 @@ namespace Emma
 #define LOG_APP_ERROR(...) Emma::Logger::GetClientLogger()->error(__VA_ARGS__);
 #define LOG_APP_CRITICAL(...) Emma::Logger::GetClientLogger()->critical(__VA_ARGS__);
 
-#ifdef EMMA_BUILD_DLL
-
-#define LOG_TRACE(...) LOG_CORE_TRACE(__VA_ARGS__)
-#define LOG_INFO(...)  LOG_CORE_INFO(__VA_ARGS__)
-#define LOG_WARN(...)  LOG_CORE_WARN(__VA_ARGS__)
-#define LOG_ERROR(...)  LOG_CORE_ERROR(__VA_ARGS__)
-#define LOG_CRITICAL(...)  LOG_CORE_CRITICAL(__VA_ARGS__)
-
 #else
 
-#define LOG_TRACE(...) LOG_APP_TRACE(__VA_ARGS__)
-#define LOG_INFO(...)  LOG_APP_INFO(__VA_ARGS__)
-#define LOG_WARN(...)  LOG_APP_WARN(__VA_ARGS__)
-#define LOG_ERROR(...)  LOG_APP_ERROR(__VA_ARGS__)
-#define LOG_CRITICAL(...)  LOG_APP_CRITICAL(__VA_ARGS__)
-#endif
+//#define LOG_TRACE(...) LOG_APP_TRACE(__VA_ARGS__)
+//#define LOG_INFO(...)  LOG_APP_INFO(__VA_ARGS__)
+//#define LOG_WARN(...)  LOG_APP_WARN(__VA_ARGS__)
+//#define LOG_ERROR(...)  LOG_APP_ERROR(__VA_ARGS__)
+//#define LOG_CRITICAL(...)  LOG_APP_CRITICAL(__VA_ARGS__)
+//#endif
 
-#else
+//#else
 
 #define LOG_CORE_TRACE(...)
 #define LOG_CORE_INFO(...)

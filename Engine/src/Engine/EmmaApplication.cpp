@@ -44,7 +44,7 @@ namespace Emma
 	void EmmaApplication::OnEvent(Event& event)
 	{
 		if (EventShouldLog[(char)event.GetEventType()])
-			LOG_TRACE(event);
+			LOG_CORE_TRACE(event);
 
 		// Maybe put windows in an extra window layer?
 		if (event.WindowId == mainWindow->WindowId)

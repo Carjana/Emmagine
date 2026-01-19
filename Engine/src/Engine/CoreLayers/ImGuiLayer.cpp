@@ -14,7 +14,7 @@ namespace Emma
 		const EmmaApplication *app = EmmaApplication::GetInstance();
 		const EmmaWindow *window = app->mainWindow;
 
-		LOG_INFO("Creating ImGui Context")
+		LOG_CORE_INFO("Creating ImGui Context")
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 
@@ -52,7 +52,7 @@ namespace Emma
 		initInfo.SwapchainComposition = Emma::SDL_SWAPCHAIN_COMPOSITION;
 		initInfo.PresentMode = Emma::SDL_PRESENT_MODE;
 		ImGui_ImplSDLGPU3_Init(&initInfo);
-		LOG_INFO("Im Gui Context created")
+		LOG_CORE_INFO("Im Gui Context created")
 
 		io.DisplaySize = ImVec2((float)app->mainWindow->Width, (float)app->mainWindow->Height);
 	}

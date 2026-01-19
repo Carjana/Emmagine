@@ -19,10 +19,10 @@ namespace Emma
 
 	void EmmaWindow::Init(const WindowProps &props)
 	{
-		LOG_INFO("Creating Window with Title \"{0}\", Width:{1}, Height:{2}", props.Title, props.Width, props.Height);
+		LOG_CORE_INFO("Creating Window with Title \"{0}\", Width:{1}, Height:{2}", props.Title, props.Width, props.Height);
 		Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE);
-		ASSERT(Window, "Window Creation Failed!", SDL_GetError());
-		LOG_INFO("Window Created with ID {0}", WindowId);
+		CORE_ASSERT(Window, "Window Creation Failed!", SDL_GetError());
+		LOG_CORE_INFO("Window Created with ID {0}", WindowId);
 		WindowId = SDL_GetWindowID(Window);
 
 		Width = props.Width;
@@ -30,15 +30,15 @@ namespace Emma
 		SDL_GetWindowPosition(Window, ((int*)&X), (int*)&Y);
 
 		GPUDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL | SDL_GPU_SHADERFORMAT_METALLIB, true, nullptr);
-		ASSERT(GPUDevice, "GPU Device Creation Failed!", SDL_GetError());
-		ASSERT_FUNC(SDL_ClaimWindowForGPUDevice(GPUDevice, Window), "Failed to claim window for GPU Device!", SDL_GetError());
+		CORE_ASSERT(GPUDevice, "GPU Device Creation Failed!", SDL_GetError());
+		CORE_ASSERT_FUNC(SDL_ClaimWindowForGPUDevice(GPUDevice, Window), "Failed to claim window for GPU Device!", SDL_GetError());
 
 		SDL_SetGPUSwapchainParameters(GPUDevice, Window, SDL_SWAPCHAIN_COMPOSITION, SDL_PRESENT_MODE);
 	}
 
 	void EmmaWindow::Shutdown() const
 	{
-		LOG_INFO("Destroying Window with ID {0}", WindowId);
+		LOG_CORE_INFO("Destroying Window with ID {0}", WindowId);
 		SDL_DestroyWindow(Window);
 	}
 
