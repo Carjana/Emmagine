@@ -32,12 +32,14 @@ namespace Emma
 	void EmmaApplication::CreateEmmaWindow(const WindowProps &props)
 	{
 		// TODO: handle multiple windows
+		CORE_ASSERT(!mainWindow)
 		mainWindow = EmmaWindow::CreateEmmaWindow(props);
 	}
 	void EmmaApplication::DestroyEmmaWindow()
 	{
 		// TODO: Queue deletion
 		// TODO: handle multiple windows
+		CORE_ASSERT(isRunning);
 		Quit();
 	}
 
@@ -172,5 +174,4 @@ namespace Emma
 		SDL_Quit();
 	}
 
-#undef BIND_EVENT_FN
 }

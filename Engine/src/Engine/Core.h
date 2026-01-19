@@ -21,13 +21,18 @@
 #endif
 
 #if DEBUG
-	#define CORE_ASSERT(condition, ...) if(!(condition)) {LOG_CORE_ERROR("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
-	#define CORE_ASSERT_FUNC(function, ...) CORE_ASSERT((function), __VA_ARGS__);
-	#define ASSERT(condition, ...) if(!(condition)) {LOG_APP_ERROR("Assertion failed! {0}", __VA_ARGS__); DEBUG_BREAK}
-	#define ASSERT_FUNC(function, ...) ASSERT((function), __VA_ARGS__);
+	#include "Engine/Logger.h"
+	#define CORE_ASSERT_MESSAGE(condition, ...) if(!(condition)) {LOG_CORE_ERROR("Assertion failed! {0}", __VA_ARGS__) DEBUG_BREAK}
+	#define CORE_ASSERT(condition) if(!(condition)) {LOG_CORE_ERROR("Assertion failed!") DEBUG_BREAK}
+	#define CORE_ASSERT_FUNC(function, ...) CORE_ASSERT_MESSAGE((function), __VA_ARGS__)
+	#define ASSERT_MESSAGE(condition, ...) if(!(condition)) {LOG_APP_ERROR("Assertion failed! {0}",__VA_ARGS__) DEBUG_BREAK}
+	#define ASSERT(condition) if(!(condition)) {LOG_APP_ERROR("Assertion failed!") DEBUG_BREAK}
+	#define ASSERT_FUNC(function, ...) ASSERT((function), __VA_ARGS__)
 #else
+	#define CORE_ASSERT_MESSAGE(condition, ...)
 	#define CORE_ASSERT(condition, ...)
 	#define CORE_ASSERT_FUNC(function, ...) function
+	#define ASSERT_MESSAGE(condition, ...)
 	#define ASSERT(condition, ...)
 	#define ASSERT_FUNC(function, ...) function
 #endif

@@ -5,7 +5,7 @@
 
 namespace EmmaEditor
 {
-	class RuntimeApplication : public Emma::EmmaApplication
+	class EditorApplication : public Emma::EmmaApplication
 	{
 		void OnInit() override
 		{
@@ -19,5 +19,5 @@ namespace EmmaEditor
 
 Emma::EmmaApplication* Emma::CreateEmmaApplication()
 {
-	return new EmmaEditor::RuntimeApplication();
+	return new EmmaEditor::EditorApplication();
 }

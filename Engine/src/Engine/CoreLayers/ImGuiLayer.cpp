@@ -12,7 +12,7 @@ namespace Emma
 	void ImGuiLayer::OnAttach()
 	{
 		const EmmaApplication *app = EmmaApplication::GetInstance();
-		const EmmaWindow *window = app->mainWindow;
+		context = app->mainWindow->Context;
 
 		LOG_CORE_INFO("Creating ImGui Context")
 		IMGUI_CHECKVERSION();
@@ -43,14 +43,14 @@ namespace Emma
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		ImGui_ImplSDL3_InitForSDLGPU(window->Window);
+		ImGui_ImplSDL3_InitForSDLGPU(context->Window);
 		ImGui_ImplSDLGPU3_InitInfo initInfo = {};
 
-		initInfo.Device = window->GPUDevice;
-		initInfo.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(window->GPUDevice, window->Window);
+		initInfo.Device = context->Device;
+		initInfo.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(context->Device, context->Window);
 		initInfo.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
-		initInfo.SwapchainComposition = Emma::SDL_SWAPCHAIN_COMPOSITION;
-		initInfo.PresentMode = Emma::SDL_PRESENT_MODE;
+		initInfo.SwapchainComposition = context->SwapchainComposition;
+		initInfo.PresentMode = context->PresentMode;
 		ImGui_ImplSDLGPU3_Init(&initInfo);
 		LOG_CORE_INFO("Im Gui Context created")
 
@@ -79,15 +79,14 @@ namespace Emma
 	void ImGuiLayer::End()
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		const EmmaApplication *app = EmmaApplication::GetInstance();
 		ImGui::Render();
 		ImDrawData* drawData = ImGui::GetDrawData();
 		const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
 
-		SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(app->mainWindow->GPUDevice);
+		SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(context->Device);
 
 		SDL_GPUTexture *swapchainTexture;
-		SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, app->mainWindow->Window, &swapchainTexture, nullptr, nullptr);
+		SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, context->Window, &swapchainTexture, nullptr, nullptr);
 
 		if (swapchainTexture != nullptr && !isMinimized)
 		{

@@ -4,6 +4,7 @@
 
 namespace Emma
 {
+	class GraphicsContext;
 
 	class EMMA_API ImGuiLayer : public Layer
 	{
@@ -19,5 +20,7 @@ namespace Emma
 
 		void HandleSDLEvent(SDL_Event &event);
 
+
+		GraphicsContext *context;
 	};
 }

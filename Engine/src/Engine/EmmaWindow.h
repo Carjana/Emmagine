@@ -7,6 +7,7 @@
 #include "SDL3/SDL_gpu.h"
 #include "SDL3/SDL_video.h"
 #include "Events/WindowEvents.h"
+#include "Rendering/GraphicsContext.h"
 
 namespace Emma
 {
@@ -18,9 +19,6 @@ namespace Emma
 		WindowProps(const std::string& title = "Emmagine", unsigned int width = 1280, unsigned int height = 720)
 			: Title(title), Width(width), Height(height) {}
 	};
-
-	static constexpr SDL_GPUSwapchainComposition SDL_SWAPCHAIN_COMPOSITION = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
-	static constexpr SDL_GPUPresentMode SDL_PRESENT_MODE = SDL_GPU_PRESENTMODE_MAILBOX;
 
 	class EMMA_API EmmaWindow
 	{
@@ -34,7 +32,7 @@ namespace Emma
 
 		unsigned int WindowId;
 		SDL_Window *Window;
-		SDL_GPUDevice *GPUDevice;
+		GraphicsContext *Context;
 
 		unsigned int Width;
 		unsigned int Height;
