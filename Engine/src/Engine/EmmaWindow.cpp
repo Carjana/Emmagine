@@ -20,7 +20,7 @@ namespace Emma
 	void EmmaWindow::Init(const WindowProps &props)
 	{
 		LOG_CORE_INFO("Creating Window with Title \"{0}\", Width:{1}, Height:{2}", props.Title, props.Width, props.Height);
-		Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE);
+		Window = SDL_CreateWindow(props.Title.c_str(), (int)props.Width, (int)props.Height, SDL_WINDOW_RESIZABLE);
 		CORE_ASSERT_MESSAGE(Window, "Window Creation Failed!", SDL_GetError());
 		LOG_CORE_INFO("Window Created with ID {0}", WindowId);
 		WindowId = SDL_GetWindowID(Window);
@@ -28,7 +28,6 @@ namespace Emma
 		Width = props.Width;
 		Height = props.Height;
 		SDL_GetWindowPosition(Window, (int*)&X, (int*)&Y);
-
 
 		GraphicsContextCreateInfo createInfo;
 		createInfo.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;

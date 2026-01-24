@@ -7,6 +7,7 @@
 #include "SDL3/SDL_init.h"
 
 #include "Logger.h"
+#include "Rendering/TestRenderer/TestRenderer.h"
 
 namespace Emma
 {
@@ -17,10 +18,11 @@ namespace Emma
 		Instance = this;
 		CreateEmmaWindow(WindowProps("Emmagine", 1280, 720));
 
-		imGuiLayer = new ImGuiLayer();
 		coreInputLayer = new CoreInput();
 		PushLayer(coreInputLayer);
-		PushLayer(imGuiLayer);
+
+		//imGuiLayer = new ImGuiLayer();
+		//PushLayer(imGuiLayer);
 	}
 
 	EmmaApplication::~EmmaApplication()
@@ -80,13 +82,16 @@ namespace Emma
 	void EmmaApplication::Run()
 	{
 		OnInit();
+		TestRenderer *testRenderer = new TestRenderer();
+		testRenderer->Init();
 		while (isRunning)
 		{
 			SDL_Event event;
 			while (SDL_PollEvent(&event))
 			{
 				// maybe handle events via emma events;
-				imGuiLayer->HandleSDLEvent(event);
+				if (imGuiLayer)
+					imGuiLayer->HandleSDLEvent(event);
 				// Handle Events
 				switch (event.type)
 				{
@@ -165,10 +170,14 @@ namespace Emma
 			for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
 				layerStack.layers[i]->OnUpdate();
 
-			imGuiLayer->Begin();
-			for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
-				layerStack.layers[i]->OnRenderImGui();
-			imGuiLayer->End();
+			if (imGuiLayer)
+			{
+				imGuiLayer->Begin();
+				for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
+					layerStack.layers[i]->OnRenderImGui();
+				imGuiLayer->End();
+			}
+			testRenderer->Run();
 		}
 		OnQuit();
 		SDL_Quit();
