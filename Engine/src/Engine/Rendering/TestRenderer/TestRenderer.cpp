@@ -2,6 +2,7 @@
 
 #include "SDL3/SDL_assert.h"
 #include "SDL3/SDL_filesystem.h"
+#include "SDL3_shadercross/SDL_shadercross.h"
 
 
 namespace Emma
@@ -121,10 +122,40 @@ namespace Emma
 	{
 		Instance = EmmaApplication::GetInstance();
 		Context = Instance->mainWindow->Context;
+		SDL_ShaderCross_Init();
+		size_t hlslSize;
+		void* hlslCode = SDL_LoadFile("D:/OtherProjects/Emmagine/Engine/Content/Shaders/Source/TexturedQuad.vert.hlsl", &hlslSize);
+		SDL_ShaderCross_HLSL_Info info {};
+		info.source = (const char*)hlslCode;
+		info.entrypoint = "main";
+		info.shader_stage = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
 
-		SDL_GPUShader *vertexShader = LoadShader(Context->Device, "TexturedQuad.vert",
+		size_t codeSize;
+		void* spirvCode = SDL_ShaderCross_CompileSPIRVFromHLSL(&info, &codeSize);
+		if (!spirvCode)
+			LOG_CORE_ERROR(SDL_GetError());
+
+		SDL_ShaderCross_SPIRV_Info spirvInfo = {};
+		spirvInfo.bytecode = (const Uint8*)spirvCode;
+		spirvInfo.bytecode_size = codeSize;
+		spirvInfo.entrypoint = "main";
+		spirvInfo.shader_stage = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
+
+		SDL_PropertiesID propertiesId {};
+		SDL_ShaderCross_GraphicsShaderResourceInfo resourceInfo {};
+		SDL_ShaderCross_GraphicsShaderMetadata *metaData = SDL_ShaderCross_ReflectGraphicsSPIRV((Uint8*)spirvCode, codeSize, propertiesId);
+		resourceInfo = metaData->resource_info;
+
+		SDL_GPUShader *vertexShader = SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(Context->Device, &spirvInfo, &resourceInfo, propertiesId);
+
+		SDL_free(metaData);
+		SDL_free(spirvCode);
+		SDL_free(hlslCode);
+		//SDL_ReleaseGPUShader(Context->Device, shader);
+
+		//SDL_GPUShader *vertexShader = LoadShader(Context->Device, "TexturedQuad.vert",
 		//SDL_GPUShader *vertexShader = LoadShader(Context->Device, "PositionColor.vert",
-			0,0,0,0);
+		//	0,0,0,0);
 		CORE_ASSERT_MESSAGE(vertexShader, SDL_GetError());
 
 		//SDL_GPUShader *fragmentShader = LoadShader(Context->Device, "SolidColor.frag",
