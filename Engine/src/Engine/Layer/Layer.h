@@ -18,6 +18,7 @@ class EMMA_API Layer
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
 		virtual void OnRenderImGui() {}
+		virtual void PostRenderImGui() {}
 		virtual void OnEvent(Event& event) {}
 	};
 }

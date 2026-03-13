@@ -14,6 +14,8 @@ namespace Emma
 		const EmmaApplication *app = EmmaApplication::GetInstance();
 		context = app->mainWindow->Context;
 
+		renderer = GetService<Renderer>();
+
 		LOG_CORE_INFO("Creating ImGui Context")
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -55,6 +57,7 @@ namespace Emma
 		LOG_CORE_INFO("Im Gui Context created")
 
 		io.DisplaySize = ImVec2((float)app->mainWindow->Width, (float)app->mainWindow->Height);
+
 	}
 
 	void ImGuiLayer::OnDetach()
@@ -66,6 +69,9 @@ namespace Emma
 
 	void ImGuiLayer::OnRenderImGui()
 	{
+		if (renderer == nullptr)
+			renderer = GetService<Renderer>();
+
 		ImGui::ShowDemoWindow();
 	}
 
@@ -78,6 +84,10 @@ namespace Emma
 
 	void ImGuiLayer::End()
 	{
+		renderer->Begin();
+
+		renderer->BatchTest();
+
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui::Render();
 		ImDrawData* drawData = ImGui::GetDrawData();
@@ -100,6 +110,7 @@ namespace Emma
 			targetInfo.mip_level = 0;
 			targetInfo.layer_or_depth_plane = 0;
 			targetInfo.cycle = false;
+
 			SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &targetInfo, 1, nullptr);
 
 			ImGui_ImplSDLGPU3_RenderDrawData(drawData, commandBuffer, renderPass);
@@ -114,6 +125,7 @@ namespace Emma
 		}
 
 		SDL_SubmitGPUCommandBuffer(commandBuffer);
+
 	}
 
 	void ImGuiLayer::HandleSDLEvent(SDL_Event &event)

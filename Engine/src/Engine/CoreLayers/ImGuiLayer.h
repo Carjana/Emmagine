@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL3/SDL_events.h"
 #include "Engine/Layer/Layer.h"
+#include "Engine/Rendering/Renderer.h"
 
 namespace Emma
 {
@@ -21,6 +22,7 @@ namespace Emma
 		void HandleSDLEvent(SDL_Event &event);
 
 
-		GraphicsContext *context;
+		GraphicsContext *context = nullptr;
+		Renderer *renderer = nullptr;
 	};
 }

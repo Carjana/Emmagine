@@ -1,7 +1,7 @@
 #include "TestRenderer.h"
 
+#include "Engine/Rendering/EmmaVertex.h"
 #include "SDL3/SDL_assert.h"
-#include "SDL3/SDL_filesystem.h"
 #include "SDL3_shadercross/SDL_shadercross.h"
 
 
@@ -123,94 +123,30 @@ namespace Emma
 		Instance = EmmaApplication::GetInstance();
 		Context = Instance->mainWindow->Context;
 		SDL_ShaderCross_Init();
-		size_t hlslSize;
-		void* hlslCode = SDL_LoadFile("D:/OtherProjects/Emmagine/Engine/Content/Shaders/Source/TexturedQuad.vert.hlsl", &hlslSize);
-		SDL_ShaderCross_HLSL_Info info {};
-		info.source = (const char*)hlslCode;
-		info.entrypoint = "main";
-		info.shader_stage = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
 
-		size_t codeSize;
-		void* spirvCode = SDL_ShaderCross_CompileSPIRVFromHLSL(&info, &codeSize);
-		if (!spirvCode)
-			LOG_CORE_ERROR(SDL_GetError());
+		Pipeline = new GraphicsPipeline();
+		GraphicsPipelineCreateInfo info = {};
+		ShaderLoadInfo vertexShaderLoadInfo = {};
+		vertexShaderLoadInfo.entryPoint = "main";
+		vertexShaderLoadInfo.absolutePath = "D:/OtherProjects/Emmagine/Engine/Content/Shaders/Source/TexturedQuad.vert.hlsl";
+		vertexShaderLoadInfo.shaderStage = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
 
-		SDL_ShaderCross_SPIRV_Info spirvInfo = {};
-		spirvInfo.bytecode = (const Uint8*)spirvCode;
-		spirvInfo.bytecode_size = codeSize;
-		spirvInfo.entrypoint = "main";
-		spirvInfo.shader_stage = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
+		ShaderLoadInfo fragmentShaderLoadInfo = {};
+		fragmentShaderLoadInfo.entryPoint = "main";
+		fragmentShaderLoadInfo.absolutePath = "D:/OtherProjects/Emmagine/Engine/Content/Shaders/Source/TexturedQuad.frag.hlsl";
+		fragmentShaderLoadInfo.shaderStage = SDL_SHADERCROSS_SHADERSTAGE_FRAGMENT;
 
-		SDL_PropertiesID propertiesId {};
-		SDL_ShaderCross_GraphicsShaderResourceInfo resourceInfo {};
-		SDL_ShaderCross_GraphicsShaderMetadata *metaData = SDL_ShaderCross_ReflectGraphicsSPIRV((Uint8*)spirvCode, codeSize, propertiesId);
-		resourceInfo = metaData->resource_info;
+		info.VertexShaderInfo = vertexShaderLoadInfo;
+		info.FragmentShaderInfo = fragmentShaderLoadInfo;
+		info.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(Context->Device, Context->Window);
+		EmmaVertex::FillVertexBufferLayout(info.VertexBufferLayout);
+		Pipeline->CreateGraphicsPipeline(Context, &info);
 
-		SDL_GPUShader *vertexShader = SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(Context->Device, &spirvInfo, &resourceInfo, propertiesId);
-
-		SDL_free(metaData);
-		SDL_free(spirvCode);
-		SDL_free(hlslCode);
-		//SDL_ReleaseGPUShader(Context->Device, shader);
-
-		//SDL_GPUShader *vertexShader = LoadShader(Context->Device, "TexturedQuad.vert",
-		//SDL_GPUShader *vertexShader = LoadShader(Context->Device, "PositionColor.vert",
-		//	0,0,0,0);
-		CORE_ASSERT_MESSAGE(vertexShader, SDL_GetError());
-
-		//SDL_GPUShader *fragmentShader = LoadShader(Context->Device, "SolidColor.frag",
-		SDL_GPUShader *fragmentShader = LoadShader(Context->Device, "TexturedQuad.frag",
-			1,0,0,0);
-		CORE_ASSERT_MESSAGE(fragmentShader, SDL_GetError());
 
 		SDL_Surface *imageData = LoadSDLImage("ravioli.bmp", 4);
 		CORE_ASSERT_MESSAGE(imageData, SDL_GetError());
-
-		// pipeline
-		SDL_GPUColorTargetDescription colorTargetDescription = {};
-		colorTargetDescription.format = SDL_GetGPUSwapchainTextureFormat(Context->Device, Context->Window);
-		SDL_GPUColorTargetDescription colorTargetDescriptions[] = {colorTargetDescription};
-
-		SDL_GPUGraphicsPipelineTargetInfo pipelineTargetInfo = {};
-		pipelineTargetInfo.color_target_descriptions = colorTargetDescriptions;
-		pipelineTargetInfo.num_color_targets = 1;
-
-		SDL_GPUVertexAttribute vertexAttributes[] =
-		{
-		{	0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},
-		{1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,  sizeof(vec3)}
-		};
-
-		SDL_GPUVertexBufferDescription vertexBufferDescriptions[] =
-		{
-		{0, sizeof(TempVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX}
-		};
-
-		SDL_GPUVertexInputState vertexInputState = {};
-		vertexInputState.vertex_attributes = vertexAttributes;
-		vertexInputState.num_vertex_attributes = ArrayCount(vertexAttributes);
-		vertexInputState.vertex_buffer_descriptions = vertexBufferDescriptions;
-		vertexInputState.num_vertex_buffers = ArrayCount(vertexBufferDescriptions);
-
-		SDL_GPUGraphicsPipelineCreateInfo pipelineInfo {};
-		pipelineInfo.vertex_shader = vertexShader;
-		pipelineInfo.fragment_shader = fragmentShader;
-		pipelineInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
-
-		pipelineInfo.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-		pipelineInfo.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
-
-		pipelineInfo.target_info = pipelineTargetInfo;
-
-		pipelineInfo.vertex_input_state = vertexInputState;
-
-		Pipeline = SDL_CreateGPUGraphicsPipeline(Instance->mainWindow->Context->Device, &pipelineInfo);
-		CORE_ASSERT_MESSAGE(Pipeline, SDL_GetError());
-
-		SDL_ReleaseGPUShader(Context->Device, vertexShader);
-		SDL_ReleaseGPUShader(Context->Device, fragmentShader);
-
 		// Sampler
+
 
 		// PointClamp
 		SDL_GPUSamplerCreateInfo pointClampInfo = {};
@@ -291,7 +227,7 @@ namespace Emma
 
 		// Vertices and Vertex Buffer
 
-		TempVertex vertices[]
+		EmmaVertex vertices[]
 		{
 			// triangle
 			// {{-0.5f,-0.5f,0.0f}, {255,0,0,255}},
@@ -311,40 +247,13 @@ namespace Emma
 			2, 3, 0		// second triangle
 		};
 
-		// create vertex Buffer
-		SDL_GPUBufferCreateInfo vertexBufferCreateInfo {};
-		vertexBufferCreateInfo.size = sizeof(vertices);
-		vertexBufferCreateInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+		VertexBuffer = new Emma::VertexBuffer();
+		VertexBuffer->Create(Context, sizeof(vertices));
+		VertexBuffer->UploadDataToBuffer(vertices, sizeof(vertices));
 
-		VertexBuffer = SDL_CreateGPUBuffer(Context->Device, &vertexBufferCreateInfo);
-		CORE_ASSERT_MESSAGE(VertexBuffer, SDL_GetError());
-		SDL_SetGPUBufferName(Context->Device, VertexBuffer, "VertexBuffer");
-
-		// create index Buffer
-		SDL_GPUBufferCreateInfo indexBufferCreateInfo {};
-		indexBufferCreateInfo.size = sizeof(indices);
-		indexBufferCreateInfo.usage = SDL_GPU_BUFFERUSAGE_INDEX;
-
-		IndexBuffer = SDL_CreateGPUBuffer(Context->Device, &indexBufferCreateInfo);
-		CORE_ASSERT_MESSAGE(IndexBuffer, SDL_GetError());
-		SDL_SetGPUBufferName(Context->Device, IndexBuffer, "IndexBuffer");
-
-		// transfer Buffer
-		SDL_GPUTransferBufferCreateInfo vertexTransferBufferCreateInfo {};
-		vertexTransferBufferCreateInfo.size = sizeof(vertices) + sizeof(indices);
-		vertexTransferBufferCreateInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-
-		// create vertex transferbuffer and map memory to it
-		SDL_GPUTransferBuffer *vertexTransferBuffer = SDL_CreateGPUTransferBuffer(Context->Device, &vertexTransferBufferCreateInfo);
-		CORE_ASSERT_MESSAGE(vertexTransferBuffer, SDL_GetError());
-		Uint8 *mappedMemory = (Uint8 *)SDL_MapGPUTransferBuffer(Context->Device, vertexTransferBuffer, false);
-		CORE_ASSERT_MESSAGE(mappedMemory != nullptr, SDL_GetError());
-
-		SDL_memcpy(mappedMemory, vertices, sizeof(vertices));
-		// ReSharper disable once CppDFANullDereference
-		SDL_memcpy(mappedMemory + sizeof(vertices), indices, sizeof(indices));
-
-		SDL_UnmapGPUTransferBuffer(Context->Device, vertexTransferBuffer);
+		IndexBuffer = new Emma::IndexBuffer();
+		IndexBuffer->Create(Context, sizeof(indices));
+		IndexBuffer->UploadDataToBuffer(indices, ArrayCount(indices));
 
 		// create texture transferbuffer and map memory to it
 		SDL_GPUTransferBufferCreateInfo textureTransferBufferCreateInfo {};
@@ -365,28 +274,6 @@ namespace Emma
 
 		SDL_GPUCopyPass *copyPass = SDL_BeginGPUCopyPass(cmdBuffer);
 
-		SDL_GPUTransferBufferLocation vertexBufferLocation {};
-		vertexBufferLocation.offset = 0;
-		vertexBufferLocation.transfer_buffer = vertexTransferBuffer;
-
-		SDL_GPUBufferRegion vertexGPUBufferRegion {};
-		vertexGPUBufferRegion.buffer = VertexBuffer;
-		vertexGPUBufferRegion.offset = 0;
-		vertexGPUBufferRegion.size = sizeof(vertices);
-
-		SDL_UploadToGPUBuffer(copyPass, &vertexBufferLocation, &vertexGPUBufferRegion, false);
-
-		SDL_GPUTransferBufferLocation indexBufferLocation {};
-		indexBufferLocation.transfer_buffer = vertexTransferBuffer;
-		indexBufferLocation.offset = sizeof(vertices);
-
-		SDL_GPUBufferRegion indexGPUBufferRegion {};
-		indexGPUBufferRegion.buffer = IndexBuffer;
-		indexGPUBufferRegion.offset = 0;
-		indexGPUBufferRegion.size = sizeof(indices);
-
-		SDL_UploadToGPUBuffer(copyPass, &indexBufferLocation, &indexGPUBufferRegion, false);
-
 		SDL_GPUTextureTransferInfo textureSourceInfo {};
 		textureSourceInfo.transfer_buffer = textureTransferBuffer;
 		textureSourceInfo.offset = 0;
@@ -403,7 +290,6 @@ namespace Emma
 
 		CORE_ASSERT_FUNC(SDL_SubmitGPUCommandBuffer(cmdBuffer), SDL_GetError());
 
-		SDL_ReleaseGPUTransferBuffer(Context->Device, vertexTransferBuffer);
 		SDL_DestroySurface(imageData);
 		SDL_ReleaseGPUTransferBuffer(Context->Device, textureTransferBuffer);
 	}
@@ -420,30 +306,20 @@ namespace Emma
 			colorTargetInfo.texture = swapChainTexture;
 			colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 			colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
-			colorTargetInfo.clear_color = SDL_FColor{1.0f,0.0f,1.0f,1.0f};
+			colorTargetInfo.clear_color = SDL_FColor{0.2f,0.1f,0.3f,1.0f};
 
 			SDL_GPUColorTargetInfo colorTargetInfos[] =
 			{
 				colorTargetInfo
 			};
+			CORE_ASSERT_MESSAGE(Pipeline->numColorTargets == ArrayCount(colorTargetInfos), "This must match!");
+			SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, colorTargetInfos, Pipeline->numColorTargets, nullptr);
 
-			SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, colorTargetInfos, 1, nullptr);
+			Pipeline->Bind(renderPass);
 
-			SDL_BindGPUGraphicsPipeline(renderPass, Pipeline);
+			VertexBuffer->Bind(renderPass);
 
-
-			SDL_GPUBufferBinding bufferBindings[]
-			{
-				{VertexBuffer, 0}
-			};
-
-			SDL_BindGPUVertexBuffers(renderPass, 0, bufferBindings, ArrayCount(bufferBindings));
-
-			SDL_GPUBufferBinding indexBufferBinding;
-			indexBufferBinding.buffer = IndexBuffer;
-			indexBufferBinding.offset = 0;
-
-			SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+			IndexBuffer->Bind(renderPass);
 
 			SDL_GPUTextureSamplerBinding samplerBindings[]
 			{
@@ -458,5 +334,19 @@ namespace Emma
 		}
 
 		SDL_SubmitGPUCommandBuffer(commandBuffer);
+	}
+
+	void TestRenderer::Shutdown()
+	{
+		VertexBuffer->ReleaseBuffer();
+		IndexBuffer->ReleaseBuffer();
+		Pipeline->ReleasePipeline();
+
+		for (SDL_GPUSampler *Sampler: Samplers)
+		{
+			SDL_ReleaseGPUSampler(Context->Device, Sampler);
+		}
+
+		SDL_ReleaseGPUTexture(Context->Device, Texture);
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL3/SDL_gpu.h"
+#include "SDL3/SDL_render.h"
 
 
 namespace Emma
@@ -9,6 +10,15 @@ namespace Emma
 		SDL_GPUSwapchainComposition SwapchainComposition;
 		SDL_GPUPresentMode PresentMode;
 	};
+
+	struct WindowRect
+	{
+		unsigned int X;
+		unsigned int Y;
+		unsigned int Width;
+		unsigned int Height;
+	};
+
 	class GraphicsContext
 	{
 	public:
@@ -19,6 +29,8 @@ namespace Emma
 
 		SDL_Window *Window;
 		SDL_GPUDevice *Device;
+
+		WindowRect WindowRect;
 
 		SDL_GPUSwapchainComposition SwapchainComposition;
 		SDL_GPUPresentMode PresentMode;

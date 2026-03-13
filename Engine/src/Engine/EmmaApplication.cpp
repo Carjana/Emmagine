@@ -7,7 +7,8 @@
 #include "SDL3/SDL_init.h"
 
 #include "Logger.h"
-#include "Rendering/TestRenderer/TestRenderer.h"
+#include "Engine/Rendering/Renderer.h"
+#include "Engine/ServiceProvider/ServiceProvider.h"
 
 namespace Emma
 {
@@ -16,33 +17,17 @@ namespace Emma
 	EmmaApplication::EmmaApplication()
 	{
 		Instance = this;
-		CreateEmmaWindow(WindowProps("Emmagine", 1280, 720));
+		mainWindow = new EmmaWindow(WindowProps("Emmagine", 1280, 720));
+
+		Renderer *renderer = new Renderer();
+		renderer->CreateBuffersAndPipeline(mainWindow->Context);
+		RegisterService<Renderer>(renderer);
 
 		coreInputLayer = new CoreInput();
 		PushLayer(coreInputLayer);
 
-		//imGuiLayer = new ImGuiLayer();
-		//PushLayer(imGuiLayer);
-	}
-
-	EmmaApplication::~EmmaApplication()
-	{
-		if (mainWindow != nullptr)
-			delete mainWindow;
-	}
-
-	void EmmaApplication::CreateEmmaWindow(const WindowProps &props)
-	{
-		// TODO: handle multiple windows
-		CORE_ASSERT(!mainWindow)
-		mainWindow = EmmaWindow::CreateEmmaWindow(props);
-	}
-	void EmmaApplication::DestroyEmmaWindow()
-	{
-		// TODO: Queue deletion
-		// TODO: handle multiple windows
-		CORE_ASSERT(isRunning);
-		Quit();
+		imGuiLayer = new ImGuiLayer();
+		PushLayer(imGuiLayer);
 	}
 
 	void EmmaApplication::OnEvent(Event& event)
@@ -50,7 +35,7 @@ namespace Emma
 		if (EventShouldLog[(char)event.GetEventType()])
 			LOG_CORE_TRACE(event);
 
-		// Maybe put windows in an extra window layer?
+		// Maybe put window in an extra window layer?
 		if (event.WindowId == mainWindow->WindowId)
 			mainWindow->OnEvent(event);
 
@@ -82,90 +67,9 @@ namespace Emma
 	void EmmaApplication::Run()
 	{
 		OnInit();
-		TestRenderer *testRenderer = new TestRenderer();
-		testRenderer->Init();
 		while (isRunning)
 		{
-			SDL_Event event;
-			while (SDL_PollEvent(&event))
-			{
-				// maybe handle events via emma events;
-				if (imGuiLayer)
-					imGuiLayer->HandleSDLEvent(event);
-				// Handle Events
-				switch (event.type)
-				{
-					case SDL_EVENT_WINDOW_MOVED:
-					{
-						WindowMoveEvent emmaEvent(event.window.windowID, event.window.data1, event.window.data2);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_WINDOW_RESIZED:
-					{
-						WindowResizeEvent emmaEvent(event.window.windowID, event.window.data1, event.window.data2);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_WINDOW_MOUSE_ENTER:
-					{
-						WindowMouseFocusEvent emmaEvent(event.window.windowID, true);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_WINDOW_MOUSE_LEAVE:
-					{
-						WindowMouseFocusEvent emmaEvent(event.window.windowID, false);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_WINDOW_FOCUS_GAINED:
-					{
-						WindowFocusEvent emmaEvent(event.window.windowID, true);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_WINDOW_FOCUS_LOST:
-					{
-						WindowFocusEvent emmaEvent(event.window.windowID, false);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-					{
-						WindowCloseRequestEvent emmaEvent(event.window.windowID);
-						OnEvent(emmaEvent);
-					}break;
-
-					case SDL_EVENT_MOUSE_MOTION:
-					{
-						if (mainWindow->HasFocus)
-						{
-							MouseMovedEvent mouseEvent(event.motion.windowID, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel, event.motion.x / (float)mainWindow->Width, event.motion.y / (float)mainWindow->Height);
-							OnEvent(mouseEvent);
-						}
-					}
-					break;
-					case SDL_EVENT_MOUSE_BUTTON_DOWN:
-					case SDL_EVENT_MOUSE_BUTTON_UP:
-					{
-						MouseButtonEvent emmaEvent(event.button.windowID, SDL_BUTTON_MASK(event.button.button), event.button.down);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_MOUSE_WHEEL:
-					{
-						MouseWheelEvent emmaEvent(event.wheel.windowID, event.wheel.x, event.wheel.y);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_KEY_DOWN:
-					case SDL_EVENT_KEY_UP:
-					{
-						KeyEvent emmaEvent(event.key.windowID, event.key.key, event.key.scancode, event.key.mod, event.key.down);
-						OnEvent(emmaEvent);
-					}break;
-					case SDL_EVENT_TEXT_INPUT:
-					{
-						KeyTextEvent emmaEvent(event.text.windowID, event.text.text);
-						OnEvent(emmaEvent);
-					}break;
-					default:
-						break;
-				}
-			}
+			PollEvents();
 
 			for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
 				layerStack.layers[i]->OnUpdate();
@@ -176,11 +80,109 @@ namespace Emma
 				for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
 					layerStack.layers[i]->OnRenderImGui();
 				imGuiLayer->End();
+				for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
+					layerStack.layers[i]->PostRenderImGui();
 			}
-			testRenderer->Run();
+
+
 		}
 		OnQuit();
+
+		Shutdown();
 		SDL_Quit();
+	}
+
+	void EmmaApplication::Shutdown()
+	{
+		for (int i = (int)layerStack.layers.size() - 1; i >= 0; --i)
+			PopLayer(layerStack.layers[i]);
+
+		GetService<Renderer>()->Shutdown();
+		mainWindow->Shutdown();
+	}
+
+	void EmmaApplication::PollEvents()
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
+		{
+			// maybe handle events via emma events;
+			if (imGuiLayer)
+				imGuiLayer->HandleSDLEvent(event);
+			// Handle Events
+			switch (event.type)
+			{
+				case SDL_EVENT_WINDOW_MOVED:
+				{
+					WindowMoveEvent emmaEvent(event.window.windowID, event.window.data1, event.window.data2);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_WINDOW_RESIZED:
+				{
+					WindowResizeEvent emmaEvent(event.window.windowID, event.window.data1, event.window.data2);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_WINDOW_MOUSE_ENTER:
+				{
+					WindowMouseFocusEvent emmaEvent(event.window.windowID, true);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+				{
+					WindowMouseFocusEvent emmaEvent(event.window.windowID, false);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_WINDOW_FOCUS_GAINED:
+				{
+					WindowFocusEvent emmaEvent(event.window.windowID, true);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_WINDOW_FOCUS_LOST:
+				{
+					WindowFocusEvent emmaEvent(event.window.windowID, false);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				{
+					WindowCloseRequestEvent emmaEvent(event.window.windowID);
+					OnEvent(emmaEvent);
+				}break;
+
+				case SDL_EVENT_MOUSE_MOTION:
+				{
+					if (mainWindow->HasFocus)
+					{
+						MouseMovedEvent mouseEvent(event.motion.windowID, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel, event.motion.x / (float)mainWindow->Width, event.motion.y / (float)mainWindow->Height);
+						OnEvent(mouseEvent);
+					}
+				}
+				break;
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				case SDL_EVENT_MOUSE_BUTTON_UP:
+				{
+					MouseButtonEvent emmaEvent(event.button.windowID, SDL_BUTTON_MASK(event.button.button), event.button.down);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_MOUSE_WHEEL:
+				{
+					MouseWheelEvent emmaEvent(event.wheel.windowID, event.wheel.x, event.wheel.y);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_KEY_DOWN:
+				case SDL_EVENT_KEY_UP:
+				{
+					KeyEvent emmaEvent(event.key.windowID, event.key.key, event.key.scancode, event.key.mod, event.key.down);
+					OnEvent(emmaEvent);
+				}break;
+				case SDL_EVENT_TEXT_INPUT:
+				{
+					KeyTextEvent emmaEvent(event.text.windowID, event.text.text);
+					OnEvent(emmaEvent);
+				}break;
+				default:
+					break;
+			}
+		}
 	}
 
 }

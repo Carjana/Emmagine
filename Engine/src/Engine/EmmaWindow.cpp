@@ -12,11 +12,6 @@ namespace Emma
 		Init(props);
 	}
 
-	EmmaWindow::~EmmaWindow()
-	{
-		Shutdown();
-	}
-
 	void EmmaWindow::Init(const WindowProps &props)
 	{
 		LOG_CORE_INFO("Creating Window with Title \"{0}\", Width:{1}, Height:{2}", props.Title, props.Width, props.Height);
@@ -36,6 +31,10 @@ namespace Emma
 		LOG_CORE_TRACE("Creating Graphics Context for Window ID {0}...", WindowId);
 		Context = new GraphicsContext(Window);
 		Context->Init(createInfo);
+		Context->WindowRect.X = X;
+		Context->WindowRect.Y = X;
+		Context->WindowRect.Width = Width;
+		Context->WindowRect.Height = Height;
 		LOG_CORE_TRACE("Done creating Graphics Context for Window ID {0}!", WindowId);
 	}
 
@@ -60,6 +59,8 @@ namespace Emma
 	{
 		X = event.xPos;
 		Y = event.yPos;
+		Context->WindowRect.X = X;
+		Context->WindowRect.Y = Y;
 		return false;
 	}
 
@@ -67,6 +68,8 @@ namespace Emma
 	{
 		Width = event.Width;
 		Height = event.Height;
+		Context->WindowRect.Width = Width;
+		Context->WindowRect.Height = Height;
 		return false;
 	}
 
@@ -86,7 +89,7 @@ namespace Emma
 	{
 		if (event.WindowId != WindowId)
 			return false;
-		EmmaApplication::GetInstance()->DestroyEmmaWindow();
+		EmmaApplication::GetInstance()->Quit();
 		return false;
 	}
 }

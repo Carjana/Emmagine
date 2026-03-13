@@ -13,10 +13,7 @@ namespace Emma
 	{
 	public:
 		EmmaApplication();
-		virtual ~EmmaApplication();
-
-		void CreateEmmaWindow(const WindowProps &props);
-		void DestroyEmmaWindow();
+		virtual ~EmmaApplication() = default;
 
 		virtual void OnInit() {}
 		virtual void OnQuit() {}
@@ -36,14 +33,14 @@ namespace Emma
 		ImGuiLayer *imGuiLayer;
 
 		static ImGuiContext *GetImGuiContext() { return ImGui::GetCurrentContext(); }
-
 		static EmmaApplication *GetInstance(){return Instance;}
 
 	private:
 		static EmmaApplication *Instance;
-		// rethink multiple windows...
-		// maybe but isFocused etc. in EmmaWindow?
 		LayerStack layerStack;
+		void Shutdown();
+		void PollEvents();
+
 	};
 
 	EmmaApplication *CreateEmmaApplication();

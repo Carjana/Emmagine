@@ -22,7 +22,7 @@ target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/SDL3)
 target_link_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/spdlog)
 
 #target_link_libraries(Engine PUBLIC SDL3)
-target_link_libraries(Engine PUBLIC SDL3::SDL3)
+target_link_libraries(Engine PUBLIC SDL3::SDL3-shared)
 target_link_libraries(Engine PUBLIC spdlogd)
 target_link_libraries(Engine PUBLIC glm::glm-header-only)
 target_link_libraries(Engine PUBLIC ImGui)

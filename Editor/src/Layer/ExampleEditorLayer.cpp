@@ -4,6 +4,12 @@
 
 namespace EmmaEditor
 {
+	void ExampleEditorLayer::OnAttach()
+	{
+		viewportLayer = new ViewPortLayer();
+		Emma::EmmaApplication::GetInstance()->PushLayer(viewportLayer);
+	}
+
 	void ExampleEditorLayer::OnRenderImGui()
 	{
 		static bool show = true;
